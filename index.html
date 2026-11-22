@@ -1273,7 +1273,7 @@ function lvCycle(){
   const centerLine=h=>{ const w=lineHost.querySelector(".dline-wrap"), c=lineHost.querySelector(`.lc[data-h="${h}"]`);
     if(!w||!c||w.scrollWidth<=w.clientWidth) return;
     const d=(c.getBoundingClientRect().left+c.offsetWidth/2)-(w.getBoundingClientRect().left+w.clientWidth/2);
-    try{ w.scrollBy({left:d,behavior:"smooth"}); }catch(e){ w.scrollLeft+=d; } };
+    w.scrollLeft+=d; };                 /* קפיצה מיידית: גלילה "חלקה" בקו RTL צר נקטעת באמצע (נבדק בטלפון מדומה) */
   const lightLine=h=>{ $$(".lc.on",lineHost).forEach(x=>x.classList.remove("on")); if(h!=null){ lineHost.querySelector(`.lc[data-h="${h}"]`).classList.add("on"); centerLine(h); } };
   const both=h=>{ C.hl(h); lightLine(h); };
   const good=()=>{ SFX.ok(); track("day_night",miss===0,false,miss,0); if(miss===0) LV.score++; const t=cur; cur=null; say(t.ok); LV.i++; setTimeout(draw,1100); };
