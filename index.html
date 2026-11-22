@@ -1269,7 +1269,12 @@ function lvCycle(){
   if(sleepH!==wake) STEPS.push({k:"ring",h:sleepH,q:`ובשעה ${pad(sleepH)} הולכים לישון. לחצי על ${pad(sleepH)} בעיגול.`,ok:`נכון! ${pad(sleepH)} — לילה טוב.`});
   LV.n=STEPS.length;
   let cur=null, miss=0;
-  const lightLine=h=>{ $$(".lc.on",lineHost).forEach(x=>x.classList.remove("on")); if(h!=null) lineHost.querySelector(`.lc[data-h="${h}"]`).classList.add("on"); };
+  /* בטלפון רואים רק חלק מהקו — גוללים אותו אופקית לשעה שנדלקה, כדי ש"אותה שעה בשני המקומות" באמת ייראה */
+  const centerLine=h=>{ const w=lineHost.querySelector(".dline-wrap"), c=lineHost.querySelector(`.lc[data-h="${h}"]`);
+    if(!w||!c||w.scrollWidth<=w.clientWidth) return;
+    const d=(c.getBoundingClientRect().left+c.offsetWidth/2)-(w.getBoundingClientRect().left+w.clientWidth/2);
+    try{ w.scrollBy({left:d,behavior:"smooth"}); }catch(e){ w.scrollLeft+=d; } };
+  const lightLine=h=>{ $$(".lc.on",lineHost).forEach(x=>x.classList.remove("on")); if(h!=null){ lineHost.querySelector(`.lc[data-h="${h}"]`).classList.add("on"); centerLine(h); } };
   const both=h=>{ C.hl(h); lightLine(h); };
   const good=()=>{ SFX.ok(); track("day_night",miss===0,false,miss,0); if(miss===0) LV.score++; const t=cur; cur=null; say(t.ok); LV.i++; setTimeout(draw,1100); };
   const C=buildDayCircle(rp,(h)=>{
@@ -1296,6 +1301,7 @@ function lvCycle(){
       C.hl(19); lightLine(null);
       mcq(box,shuffle([["19",true],["17",false],["21",false]]),"רמז: השעה שמיד אחרי 18.",first=>{ track("day_night",first,false,first?0:1,0); if(first) LV.score++; LV.i++; setTimeout(draw,800); });
     } else if(cur.k==="ring"){ both(null); }
+    else if(cur.k==="line"){ centerLine(18); }          /* מראים את הסביבה של 18 — "19 בא מיד אחרי 18" */
     say(cur.q);
   }
   draw();
