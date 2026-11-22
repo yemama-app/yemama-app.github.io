@@ -1296,15 +1296,16 @@ function lvDay(){
     else if(sh<9) line("warn",`😴 רק ${sh.toFixed(1).replace(".0","")} שעות שינה. לילדים מומלץ 9–12 שעות — אולי ללכת לישון מוקדם יותר?`);
     else line("ok",`😴 ${sh.toFixed(1).replace(".0","")} שעות שינה — מצוין!`);
     const miss=REQUIRED.filter(r=>!list.some(x=>x.activity===r)).map(r=>allActs().find(a=>a.id===r).nm);
-    if(miss.length) line("", "📌 חסר עוד: "+miss.join(", "));
+    if(miss.length) line("", "💡 אפשר להוסיף גם: "+miss.join(", ")+" — רק אם זה מתאים ליום שלך.");
     doneRow.innerHTML="";
-    const ready=!miss.length;   /* חפיפה אף פעם לא חוסמת את הסיום */
-    const fin=el("button","btn go"+(ready?"":" ghost"), ready?"סיימתי את היום שלי ✓":"סיימתי");
+    /* "סיימתי" לעולם לא נחסם — לא בגלל חפיפה ולא בגלל פעילות שחסרה (DECISIONS: סיום אינו תלוי בתוכן) */
+    const fin=el("button","btn go","סיימתי את היום שלי ✓");
     fin.onclick=()=>{
       if(finished){ toast("היום נשמר ✓"); return; }
-      if(!ready){ say(`עוד לא — חסר: ${miss.join(", ")}.`); SFX.oops(); return; }
       const w=list.find(x=>x.activity==="wake_up"), b=list.find(x=>x.activity==="bedtime");
-      DB.data.settings.wake=w.time; DB.data.settings.sleep=b.time; save();
+      if(w) DB.data.settings.wake=w.time;
+      if(b) DB.data.settings.sleep=b.time;
+      save();
       finished=true; LV.n=null; LV.score=null;
       levelDone("בנית את היום שלך! אפשר להדפיס אותו מלוח ההורה ולתלות על המקרר.");
     };
