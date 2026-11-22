@@ -1,0 +1,2738 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>סיפור של יממה</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --night:#101c3f; --dusk:#4a3273; --sun:#ffc43d; --sky:#4fb3f6; --grass:#7fd4a3;
+  --ink:#1d2246; --ink60:#5b6189; --line:#e3e8f7; --card:#fff; --bg:#eef3ff;
+  --ok:#2fb272; --oops:#e8833c; --hour:#ef5d4e; --minute:#2f6fd0; --lock:#aab3cf;
+  --r:22px; --shadow:0 10px 30px rgba(29,34,70,.10);
+  color-scheme:light;               /* stop dark-mode browsers from repainting controls */
+}
+/* every control gets explicit ink — dark-mode browsers default button text to white */
+button,input,select,textarea{color:var(--ink);font-family:inherit}
+input,select,textarea{background:#fff}
+.pick{color:var(--ink)}
+.pick.on{color:#3a2a00}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{
+  font-family:"Rubik",system-ui,"Segoe UI",Arial,sans-serif;color:var(--ink);min-height:100vh;
+  background:
+   radial-gradient(1200px 600px at 85% -10%, #dfeaff 0%, rgba(223,234,255,0) 60%),
+   radial-gradient(900px 500px at 0% 100%, #e9fbf1 0%, rgba(233,251,241,0) 60%), var(--bg);
+}
+.app{max-width:1020px;margin:0 auto;padding:12px 14px 120px}
+
+/* ---------- top bar ---------- */
+.top{display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+.who{display:flex;align-items:center;gap:10px;background:#fff;border:2px solid var(--line);border-radius:999px;padding:5px 14px 5px 6px;box-shadow:var(--shadow)}
+.who .av{width:40px;height:40px;border-radius:50%;background:linear-gradient(140deg,#fff4d6,#ffd98a);display:grid;place-items:center;font-size:22px}
+.who .nm{font-weight:800;font-size:15px}
+.who .gr{font-size:12px;color:var(--ink60);font-weight:700}
+.spacer{flex:1}
+.pill-btn{height:42px;min-width:42px;padding:0 13px;border-radius:14px;border:2px solid var(--line);background:#fff;font:inherit;font-weight:700;font-size:14px;cursor:pointer;display:flex;align-items:center;gap:6px}
+.pill-btn:active{transform:scale(.95)}
+.starcount{display:flex;align-items:center;gap:5px;background:linear-gradient(140deg,var(--sun),#ff9f4a);color:#3a2a00;font-weight:900;border-radius:14px;padding:10px 14px;font-size:15px;box-shadow:0 6px 16px rgba(255,167,61,.35)}
+
+/* ---------- screens ---------- */
+.screen{display:none;animation:in .3s ease both}
+.screen.on{display:block}
+@keyframes in{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.panel{background:var(--card);border-radius:var(--r);box-shadow:var(--shadow);padding:18px}
+h1{font-size:27px;font-weight:900;margin:0 0 6px}
+h2{font-size:20px;font-weight:900;margin:0 0 6px}
+.lead{color:var(--ink60);font-size:15px;margin:0 0 16px;line-height:1.55}
+.btn{font:inherit;font-weight:800;border:0;border-radius:16px;padding:14px 20px;cursor:pointer;background:var(--ink);color:#fff;box-shadow:0 6px 16px rgba(29,34,70,.22)}
+.btn:active{transform:translateY(2px)}
+.btn.ghost{background:#fff;color:var(--ink);border:2px solid var(--line);box-shadow:none}
+.btn.go{background:linear-gradient(140deg,#43c47f,#22a765)}
+.btn.sun{background:linear-gradient(140deg,var(--sun),#ff9f4a);color:#3a2a00}
+.btn.wide{width:100%}
+.btn-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+.hint{background:#fff8e9;border:2px dashed #ffd98a;border-radius:14px;padding:11px 13px;font-size:14.5px;font-weight:600;color:#8a5a00;margin-top:12px}
+.good-box{background:#eafaf1;border:2px solid var(--ok);border-radius:14px;padding:11px 13px;font-weight:700;color:#15764a;margin-top:12px}
+
+/* ---------- onboarding ---------- */
+.hero{text-align:center;padding:18px 0 6px}
+.hero .big{font-size:62px;line-height:1}
+.pickrow{display:flex;gap:9px;flex-wrap:wrap;justify-content:center;margin:12px 0}
+.pick{font:inherit;font-weight:800;font-size:16px;border:2px solid var(--line);background:#fff;border-radius:16px;padding:12px 16px;cursor:pointer;transition:.15s}
+.pick:hover{transform:translateY(-2px);border-color:#c9d4f3}
+.pick.on{border-color:var(--sun);background:#fff8e8;box-shadow:0 8px 18px rgba(255,180,60,.3)}
+.pick.av{font-size:30px;padding:8px 12px;line-height:1}
+.name-input{background:#fff;color:var(--ink);font:inherit;font-weight:800;font-size:19px;text-align:center;border:2px solid var(--line);border-radius:16px;padding:13px;width:100%;max-width:330px}
+.field{display:flex;align-items:center;justify-content:space-between;gap:10px;background:#fafcff;border:2px solid var(--line);border-radius:14px;padding:10px 13px;margin-bottom:9px}
+.field label{font-weight:700;font-size:15px;display:flex;align-items:center;gap:8px}
+.field input,.field select{font:inherit;font-weight:800;font-size:16px;border:2px solid var(--line);border-radius:11px;padding:8px 10px;background:#fff;color:var(--ink)}
+.field input[type=time]{direction:ltr;text-align:center}
+
+/* ---------- journey map ---------- */
+.map{display:grid;grid-template-columns:repeat(auto-fill,minmax(168px,1fr));gap:12px}
+.node{
+  position:relative;background:var(--card);border:2px solid var(--line);border-radius:20px;padding:15px 14px;
+  cursor:pointer;text-align:center;transition:.18s;box-shadow:var(--shadow)
+}
+.node:hover{transform:translateY(-3px)}
+.node .ic{font-size:34px;line-height:1.2}
+.node .nm{font-weight:900;font-size:15.5px;margin-top:4px}
+.node .st{font-size:12.5px;font-weight:700;color:var(--ink60);margin-top:3px}
+.node .badge{position:absolute;top:9px;left:9px;font-size:17px}
+.node.done{border-color:var(--ok);background:#f4fcf8}
+.node.cur{border-color:var(--sun);background:#fffaf0;box-shadow:0 12px 26px rgba(255,180,60,.3)}
+.node.skip{opacity:.65}
+.node.lock{opacity:.55;cursor:not-allowed;background:#f7f9ff}
+.node.lock .ic{filter:grayscale(1)}
+.ladder{display:flex;align-items:center;gap:7px;margin:14px 0 6px;flex-wrap:wrap;font-size:13px;color:var(--ink60);font-weight:700}
+
+/* ---------- level shell ---------- */
+.lvl-head{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.lvl-head .t{font-weight:900;font-size:19px;flex:1}
+.bar{height:9px;border-radius:99px;background:#e7ecfb;overflow:hidden;margin-bottom:14px}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,#43c47f,#22a765);transition:width .4s}
+.task-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}
+@media (max-width:820px){.task-grid{grid-template-columns:1fr}}
+.q{font-weight:900;font-size:19px;margin:0 0 13px;line-height:1.45}
+.qmeta{font-size:13px;color:var(--ink60);font-weight:700;margin:0 0 8px}
+.opts{display:grid;gap:9px}
+.opt{font:inherit;font-weight:700;font-size:16px;text-align:right;border:2px solid var(--line);background:#fff;border-radius:16px;padding:14px 16px;cursor:pointer;display:flex;align-items:center;gap:10px;transition:.15s}
+.opt:hover{border-color:#c9d4f3;transform:translateY(-1px)}
+.opt .tag{width:28px;height:28px;border-radius:9px;background:#f1f4ff;display:grid;place-items:center;font-size:13px;flex:0 0 auto;font-weight:900}
+.opt.good{border-color:var(--ok);background:#eafaf1;color:#15764a}
+.opt.good .tag{background:var(--ok);color:#fff}
+.opt.bad{border-color:var(--oops);background:#fff6ee}
+
+/* ---------- clock widget ---------- */
+.clock-wrap{display:flex;flex-direction:column;align-items:center;gap:12px}
+.clock-wrap svg{width:100%;max-width:290px;height:auto;touch-action:none;user-select:none;display:block}
+.hand{transition:transform .25s cubic-bezier(.4,1.5,.5,1);cursor:grab}
+.hand.dragging{transition:none;cursor:grabbing}
+.static .hand{cursor:default}
+.knob{opacity:.001}
+.readout{display:flex;align-items:baseline;gap:10px;justify-content:center;flex-wrap:wrap}
+.digital{font-variant-numeric:tabular-nums;font-weight:900;font-size:32px;letter-spacing:1px;background:var(--ink);color:#8ff3c0;padding:6px 15px;border-radius:14px;direction:ltr}
+.digital.hide{display:none}
+.words{font-weight:700;color:var(--ink60);font-size:15px}
+.words.hide{display:none}
+.lap{display:flex;gap:6px;background:#f2f5ff;padding:5px;border-radius:999px;border:2px solid var(--line)}
+.lap button{font:inherit;font-weight:700;font-size:13px;border:0;background:transparent;color:var(--ink60);padding:8px 12px;border-radius:999px;cursor:pointer}
+.lap button.on{background:#fff;color:var(--ink);box-shadow:0 3px 8px rgba(29,34,70,.12)}
+.nudge{display:grid;grid-template-columns:repeat(2,auto);gap:8px;justify-content:center}
+.ngroup{display:flex;align-items:center;gap:6px;background:#f6f8ff;border:2px solid var(--line);border-radius:14px;padding:5px 9px}
+.ngroup span{font-size:13px;font-weight:700;color:var(--ink60)}
+.ngroup button{width:32px;height:32px;border-radius:10px;border:0;background:#fff;box-shadow:0 2px 6px rgba(29,34,70,.12);font-size:17px;font-weight:900;cursor:pointer;color:var(--ink)}
+.ngroup button:active{transform:scale(.9)}
+.shake{animation:shake .45s}
+@keyframes shake{0%,100%{transform:none}20%{transform:rotate(-2deg) translateX(-5px)}50%{transform:rotate(2deg) translateX(5px)}80%{transform:rotate(-1deg)}}
+
+/* ---------- cycle (24h ring + sky) ---------- */
+.ring-panel{display:flex;justify-content:center}
+.ring-panel svg{width:100%;max-width:320px;height:auto}
+.seg{cursor:pointer;transition:.2s}
+.seg.hot{stroke:#fff;stroke-width:3;filter:drop-shadow(0 0 8px rgba(255,255,255,.9))}
+.sky{position:relative;height:80px;border-radius:var(--r);overflow:hidden;margin-bottom:14px;box-shadow:var(--shadow);transition:background .7s linear}
+.orb{position:absolute;top:50%;transform:translate(50%,-50%);font-size:32px;transition:right .7s ease,top .7s ease}
+.sky .twinkle{position:absolute;width:3px;height:3px;border-radius:50%;background:#fff;opacity:0;transition:opacity .8s}
+.sky.is-night .twinkle{opacity:.9}
+.sky-label{position:absolute;inset:auto 14px 8px auto;color:#fff;font-weight:700;font-size:13px;text-shadow:0 2px 6px rgba(0,0,0,.4)}
+
+/* ---------- day builder ---------- */
+.day-wrap{display:grid;grid-template-columns:1fr 310px;gap:16px;align-items:start}
+@media (max-width:860px){.day-wrap{grid-template-columns:1fr}}
+.timeline{position:relative;background:#fafcff;border:2px solid var(--line);border-radius:18px;padding:8px 8px 8px 0;overflow:hidden}
+.trow{display:flex;align-items:stretch;gap:8px;height:34px}
+.trow .hr{width:52px;flex:0 0 auto;font-variant-numeric:tabular-nums;font-weight:800;font-size:13px;color:var(--ink60);direction:ltr;text-align:center;padding-top:1px}
+.trow .ln{flex:1;border-top:1px dashed #dde4f7}
+.blocks{position:absolute;inset:8px 68px 8px 10px;pointer-events:none}
+.blk{position:absolute;right:0;left:0;border-radius:12px;padding:5px 9px;font-weight:800;font-size:13.5px;color:#fff;display:flex;align-items:center;gap:7px;overflow:hidden;pointer-events:auto;box-shadow:0 5px 14px rgba(29,34,70,.18)}
+.blk small{font-weight:700;opacity:.9;font-variant-numeric:tabular-nums;direction:ltr}
+.blk.clash{outline:3px solid var(--oops);outline-offset:-3px;animation:shake .45s}
+.blk.host{align-items:flex-start}
+.blk.nested{margin-inline-start:20px;border:2px solid rgba(255,255,255,.6);box-shadow:0 3px 10px rgba(29,34,70,.22)}
+.blk .x{margin-inline-start:auto;background:rgba(255,255,255,.25);border:0;color:#fff;border-radius:8px;width:22px;height:22px;cursor:pointer;font-weight:900;line-height:1}
+.cardbank{display:flex;flex-direction:column;gap:8px}
+.abtn{display:flex;align-items:center;gap:9px;border:2px solid var(--line);background:#fff;border-radius:15px;padding:10px 12px;font:inherit;font-weight:800;font-size:15px;cursor:pointer;text-align:right}
+.abtn:hover{border-color:#c9d4f3;transform:translateY(-2px)}
+.abtn .e{font-size:23px}
+.abtn .dur{margin-inline-start:auto;font-size:12px;color:var(--ink60);font-weight:700}
+.abtn.used{opacity:.45;pointer-events:none}
+.summary{display:grid;gap:7px;margin-top:12px}
+.sline{display:flex;align-items:center;gap:8px;font-weight:700;font-size:14px;background:#f7f9ff;border-radius:12px;padding:9px 11px}
+.sline.warn{background:#fff6ee;color:#8a4a0a}
+.sline.ok{background:#f1fbf6;color:#15764a}
+.sline.ask{background:#fff8f0;color:#7a4e12}
+.modal{position:fixed;inset:0;background:rgba(16,22,52,.55);display:none;place-items:center;z-index:60;padding:14px}
+.modal.on{display:grid}
+.modal .box{background:#fff;border-radius:24px;padding:18px;max-width:380px;width:100%;box-shadow:0 30px 60px rgba(0,0,0,.3);max-height:92vh;overflow:auto}
+
+/* ---------- parent ---------- */
+.ptable{width:100%;border-collapse:collapse;font-size:14.5px}
+.ptable th,.ptable td{text-align:right;padding:9px 10px;border-bottom:1px solid var(--line)}
+.ptable th{color:var(--ink60);font-size:13px}
+.tag-ok{background:#eafaf1;color:#15764a;border-radius:8px;padding:3px 8px;font-weight:800;font-size:12.5px}
+.tag-no{background:#f3f5fc;color:var(--ink60);border-radius:8px;padding:3px 8px;font-weight:800;font-size:12.5px}
+
+/* ---------- guide ---------- */
+.guide{position:fixed;inset:auto 0 10px;margin:0 auto;max-width:1020px;padding:0 14px;display:flex;align-items:flex-end;gap:10px;z-index:20;pointer-events:none}
+.owl{width:54px;height:54px;border-radius:50%;background:linear-gradient(140deg,#fff,#eaf1ff);border:3px solid #fff;box-shadow:var(--shadow);display:grid;place-items:center;font-size:28px;flex:0 0 auto}
+.bubble{background:var(--ink);color:#fff;border-radius:20px 20px 20px 6px;padding:12px 15px;font-weight:700;font-size:15px;box-shadow:var(--shadow);line-height:1.5;flex:1}
+.bubble.pop{animation:bpop .32s ease}
+@keyframes bpop{from{transform:scale(.95);opacity:.5}to{transform:none;opacity:1}}
+body.older .owl{display:none}
+body.older .bubble{background:#fff;color:var(--ink);border:2px solid var(--line);border-radius:16px;font-size:14.5px}
+body.young .q{font-size:21px}
+body.young .opt{font-size:17.5px;padding:16px}
+.toast{position:fixed;inset:14px 0 auto;margin:0 auto;width:max-content;max-width:90%;background:var(--ok);color:#fff;font-weight:800;padding:12px 20px;border-radius:999px;box-shadow:0 12px 30px rgba(47,178,114,.45);z-index:70;animation:toast 1.9s ease forwards}
+.toast.oops{background:var(--oops)}
+@keyframes toast{0%{transform:translateY(-24px);opacity:0}15%,70%{transform:none;opacity:1}100%{transform:translateY(-14px);opacity:0}}
+.confetti{position:fixed;top:-20px;font-size:22px;z-index:69;pointer-events:none;animation:fall linear forwards}
+@keyframes fall{to{transform:translateY(105vh) rotate(420deg);opacity:.2}}
+.print-only{display:none}
+@media print{body{background:#fff}.app,.guide{display:none}.print-only{display:block;padding:12px}
+  .prow{display:flex;align-items:center;gap:12px;border:1px solid #bbb;border-radius:14px;padding:9px;margin-bottom:7px;break-inside:avoid}
+  .prow .t{font-weight:900;font-size:19px;direction:ltr}}
+/* ---------- pies / 12+12 line / digital ---------- */
+.pies{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;margin:6px 0 16px}
+.pie{text-align:center}
+.pie .pl{font-weight:800;font-size:14px;margin-top:4px}
+.tline{display:grid;grid-template-columns:auto 1fr;gap:6px 10px;align-items:center;background:#fafcff;border:2px solid var(--line);border-radius:16px;padding:10px 12px;margin-bottom:14px}
+.tl-lab{font-size:12.5px;font-weight:800;color:var(--ink60);white-space:nowrap}
+.tl-row{display:grid;grid-template-columns:repeat(12,1fr);gap:4px}
+.tl-row span{text-align:center;font-weight:800;font-size:14px;border-radius:8px;padding:5px 0;background:#fff;border:1.5px solid var(--line);font-variant-numeric:tabular-nums;transition:.2s}
+.tl-row span.col{background:#fff8e8;border-color:#ffd98a}
+.tl-row span.on{background:var(--sun);border-color:var(--sun);color:#3a2a00;transform:scale(1.14)}
+@media (max-width:520px){.tl-row span{font-size:11px;padding:4px 0}.tl-lab{font-size:11px}}
+.digi{direction:ltr;display:inline-grid;grid-template-columns:auto auto auto;gap:2px 4px;align-items:center;justify-items:center;background:var(--ink);border-radius:20px;padding:12px 16px 14px;box-shadow:var(--shadow);margin:10px auto}
+.digi .lab{font-size:13px;font-weight:800;color:#9fb0da}
+.digi b{font-size:58px;font-weight:900;color:#8ff3c0;font-variant-numeric:tabular-nums;border-radius:14px;padding:0 10px;cursor:pointer;transition:.2s;line-height:1.15}
+.digi b:hover{background:rgba(143,243,192,.1)}
+.digi b.ok{background:rgba(47,178,114,.35)}
+.digi b.no{background:rgba(232,131,60,.4)}
+.digi i{font-style:normal;font-size:50px;color:#8ff3c0;font-weight:900}
+.digi.tick b{animation:tick .45s ease}
+@keyframes tick{0%{transform:translateY(-8px);opacity:.3}100%{transform:none;opacity:1}}
+/* ---------- the day as a line (00 → 23) ---------- */
+.dline-wrap{overflow-x:auto;padding:8px 2px 4px;margin-bottom:14px;-webkit-overflow-scrolling:touch}
+.dline{display:grid;grid-template-columns:repeat(24,minmax(36px,1fr));gap:3px;min-width:880px}
+.lc{border:0;border-radius:10px;padding:4px 0 7px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:1px;font:inherit;transition:.15s}
+.lc.d{background:#dff1ff;color:var(--ink)}
+.lc.n{background:#26346b;color:#fff}
+.lc b{font-size:15px;font-weight:900;font-variant-numeric:tabular-nums}
+.lc small{font-size:13px;min-height:17px}
+.lc:hover{transform:translateY(-2px)}
+.lc.on{background:var(--sun);color:#3a2a00;transform:scale(1.13)}
+.lc.no{background:var(--oops);color:#fff}
+.dline-cap{display:flex;justify-content:space-between;font-size:12.5px;font-weight:800;color:var(--ink60);margin-top:7px;min-width:880px}
+.tline.tap span{cursor:pointer}
+.tline.tap span:hover{background:#fff8e8}
+.tline span.no{background:var(--oops);color:#fff;border-color:var(--oops)}
+/* ---------- digital time picker ---------- */
+.dpick{direction:ltr;display:flex;justify-content:center;align-items:center;gap:10px;background:var(--ink);border-radius:20px;padding:12px 18px;margin:10px auto;width:max-content}
+.dpick .col{display:flex;flex-direction:column;align-items:center;gap:4px}
+.dpick b{font-size:52px;color:#8ff3c0;font-weight:900;font-variant-numeric:tabular-nums;line-height:1.1}
+.dpick i{font-style:normal;font-size:46px;color:#8ff3c0;font-weight:900;margin-top:18px}
+.dpick button{width:58px;height:36px;border-radius:11px;border:0;background:rgba(255,255,255,.16);color:#fff;font-size:16px;cursor:pointer}
+.dpick button:active{transform:scale(.92)}
+.dpick .lab{font-size:12.5px;color:#9fb0da;font-weight:800}
+.pickwords{text-align:center;font-weight:800;color:var(--ink60);margin-bottom:6px}
+/* ---------- parent gate + tester mode ---------- */
+.devpill{background:#ffe3d6;color:#9a3a10;border:2px solid #ffb48f;border-radius:999px;padding:8px 12px;font-weight:800;font-size:13px}
+.devpill[hidden]{display:none}
+.devbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:#fff3e8;border:2px dashed #ffb48f;color:#8a4a0a;border-radius:14px;padding:10px 12px;font-weight:700;font-size:14px;margin-bottom:14px}
+.devbar span{flex:1;min-width:220px}
+.devtools{display:flex;gap:7px;flex-wrap:wrap;align-items:center;width:100%;margin-top:4px}
+.devtools .btn{padding:8px 11px;font-size:13px;box-shadow:none}
+.devtools select{font:inherit;font-weight:700;font-size:13.5px;border:2px solid #ffb48f;border-radius:10px;padding:6px 8px;background:#fff;color:var(--ink)}
+.node.open{border-color:#c9d4f3}
+.devbox{margin-top:22px;border-top:2px solid var(--line);padding-top:16px}
+.linkbtn{background:none;border:0;color:var(--minute);font:inherit;font-weight:700;text-decoration:underline;cursor:pointer;margin-top:12px;padding:0}
+.pin{letter-spacing:12px;text-align:center;font-size:26px!important;max-width:220px!important;display:block;margin:6px auto}
+.gate-q{font-size:30px;font-weight:900;text-align:center;direction:ltr;margin:6px 0 10px}
+/* ---------- week / tasks / planning ---------- */
+.pill-btn[hidden]{display:none}
+.weekgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(136px,1fr));gap:10px}
+.dayc{background:#fafcff;border:2px solid var(--line);border-radius:16px;padding:10px;min-height:130px;display:flex;flex-direction:column;gap:6px}
+.dayc.today{border-color:var(--sun);background:#fffaf0}
+.dayc h4{margin:0;font-size:15px;font-weight:900;display:flex;justify-content:space-between;align-items:baseline}
+.dayc h4 small{color:var(--ink60);font-weight:700;font-size:12px}
+.witem{display:flex;align-items:center;gap:5px;background:#fff;border:1.5px solid var(--line);border-radius:10px;padding:5px 7px;font-size:12.5px;font-weight:700;line-height:1.3}
+.witem .t{font-variant-numeric:tabular-nums;direction:ltr;color:var(--ink60);font-size:11.5px}
+.witem.due{border-color:#f0a0a0;background:#fff4f4}
+.witem.step{border-style:dashed}
+.witem.one{border-color:#c9b8f0}
+.witem .x{margin-inline-start:auto;border:0;background:none;cursor:pointer;color:var(--ink60);font-weight:900;font-size:15px;padding:0 2px}
+.load{height:7px;border-radius:9px;background:#e7ecfb;overflow:hidden;margin-top:auto}
+.load i{display:block;height:100%}
+.loadlbl{font-size:11.5px;font-weight:800;color:var(--ink60)}
+.chips{display:flex;gap:7px;flex-wrap:wrap;margin:4px 0 10px}
+.chip2{font:inherit;font-weight:800;font-size:14px;border:2px solid var(--line);background:#fff;border-radius:12px;padding:8px 11px;cursor:pointer;color:var(--ink)}
+.chip2.on{border-color:var(--sun);background:#fff8e8}
+.taskc{background:#fff;border:2px solid var(--line);border-radius:18px;padding:13px;margin-bottom:10px}
+.taskc.done{border-color:var(--ok);background:#f4fcf8}
+.taskc h3{margin:0 0 3px;font-size:16.5px;display:flex;gap:8px;align-items:center}
+.taskc h3 .del{margin-inline-start:auto;border:0;background:none;color:var(--ink60);font-size:18px;cursor:pointer}
+.taskc .due{font-size:13px;font-weight:700;color:var(--ink60);margin-bottom:6px}
+.stp{display:flex;align-items:center;gap:8px;padding:6px 0;border-top:1px dashed var(--line);font-weight:700;font-size:14px}
+.stp input[type=checkbox]{width:21px;height:21px;accent-color:var(--ok);flex:0 0 auto}
+.stp input.st{flex:1;min-width:0;border:0;font:inherit;font-weight:700;background:transparent;color:var(--ink)}
+.stp input[type=date]{font:inherit;font-size:12.5px;border:1.5px solid var(--line);border-radius:8px;padding:3px 5px;direction:ltr;background:#fff;color:var(--ink)}
+.stp.done input.st{text-decoration:line-through;color:var(--ink60)}
+.warn{background:#fff6ee;border:2px solid #ffc89a;color:#8a4a0a;border-radius:12px;padding:8px 10px;font-weight:700;font-size:13.5px;margin-top:8px}
+.formrow{margin-bottom:12px}
+.formrow>label{display:block;font-weight:800;font-size:14px;margin-bottom:5px}
+.formrow input[type=text],.formrow input[type=date],.formrow select{font:inherit;font-weight:700;font-size:16px;border:2px solid var(--line);border-radius:12px;padding:9px 11px;width:100%;background:#fff;color:var(--ink)}
+.formrow input[type=date]{direction:ltr;text-align:right}
+.emojis{display:flex;gap:5px;flex-wrap:wrap}
+.emojis button{font-size:22px;border:2px solid var(--line);background:#fff;border-radius:10px;width:42px;height:42px;cursor:pointer;padding:0}
+.emojis button.on{border-color:var(--sun);background:#fff8e8}
+.weekrows{display:grid;gap:6px;margin-bottom:14px}
+.wrow{display:flex;align-items:center;gap:10px;border:2px solid var(--line);border-radius:12px;padding:7px 10px;background:#fff;cursor:pointer;font:inherit;color:var(--ink)}
+.wrow b{width:62px;font-weight:900;text-align:right;flex:0 0 auto}
+.wrow .bar24{flex:1;height:14px;border-radius:8px;background:linear-gradient(270deg,#26346b 0%,#26346b 22%,#7cc8f7 30%,#7cc8f7 72%,#f0875a 80%,#26346b 88%)}
+.wrow small{font-size:11px;color:var(--ink60);direction:ltr;font-weight:700}
+.wrow.on{border-color:var(--sun);background:#fff8e8}
+.wrow.no{border-color:var(--oops);background:#fff6ee}
+.plansteps{display:flex;gap:6px;margin-bottom:14px}
+.plansteps span{flex:1;height:8px;border-radius:9px;background:#e7ecfb}
+.plansteps span.on{background:var(--ok)}
+.abtn.add{border-style:dashed;color:var(--minute)}
+/* ---------- daily journey · mastery · voice ---------- */
+.mission{background:#fffaf0;border:2px solid #ffd98a;border-radius:16px;padding:12px 14px;margin:6px 0 14px;font-weight:800}
+.story{margin-top:16px;background:#fafcff;border:2px solid var(--line);border-radius:16px;padding:12px}
+.story-t{font-weight:800;margin-bottom:9px}
+.dots{display:flex;gap:6px;justify-content:space-between}
+.dot{display:flex;flex-direction:column;align-items:center;gap:4px;flex:1}
+.dot b{width:32px;height:32px;border-radius:50%;background:#e7ecfb;display:grid;place-items:center;color:#fff;font-size:15px}
+.dot.on b{background:var(--ok)}
+.dot.now b{outline:3px solid var(--sun);outline-offset:2px}
+.dot small{font-size:12px;font-weight:800;color:var(--ink60)}
+.mbar{height:6px;border-radius:9px;background:#e7ecfb;overflow:hidden;margin-top:8px}
+.mbar i{display:block;height:100%}
+.say-btn{border:0;background:#e4ecff;border-radius:12px;width:48px;height:42px;margin-inline-start:10px;cursor:pointer;font-size:21px;vertical-align:middle;box-shadow:0 2px 6px rgba(29,34,70,.12)}
+.say-btn:active{transform:scale(.92)}
+body.novoice .say-btn{display:none}
+.owl{pointer-events:auto;cursor:pointer}
+.skilltbl .sb{display:inline-block;width:90px;height:8px;border-radius:9px;background:#e7ecfb;overflow:hidden;vertical-align:middle;margin-inline-end:6px}
+.skilltbl .sb i{display:block;height:100%}
+/* ---------- worked examples · pilot report ---------- */
+.excard{background:#f2f7ff;border:2px solid #c9dafc;border-radius:16px;padding:12px 14px;margin-top:12px}
+.ex-lead{font-weight:800;margin-bottom:8px}
+.ex-body{display:flex;gap:12px;align-items:center}
+.ex-body p{margin:0;font-weight:700;line-height:1.65}
+.ex-body svg{flex:0 0 auto}
+.report{width:100%;min-height:280px;font:inherit;font-size:13.5px;line-height:1.55;border:2px solid var(--line);border-radius:12px;padding:10px;direction:rtl;background:#fafcff;color:var(--ink)}
+.skilltbl .st-cell{font-weight:900;white-space:nowrap}
+.skilltbl .muted{color:var(--ink60);font-size:12.5px}
+.voicediag{background:#fafcff;border:2px solid var(--line);border-radius:12px;padding:10px 12px;margin:4px 0 10px;font-weight:700;font-size:14px;line-height:1.6}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="top">
+    <div class="who" id="who">
+      <span class="av" id="avBox">🦊</span>
+      <span><span class="nm" id="nmBox">שלום!</span><br><span class="gr" id="grBox">כיתה ג׳</span></span>
+    </div>
+    <span class="devpill" id="devPill" hidden>🛠️ מצב בודק</span>
+    <div class="spacer"></div>
+    <div class="starcount">⭐ <span id="starCount">0</span></div>
+    <button class="pill-btn" id="mapBtn">🗺️ המפה</button>
+    <button class="pill-btn" id="weekBtn" hidden>🗓️ השבוע</button>
+    <button class="pill-btn" id="tasksBtn" hidden>📝 מטלות</button>
+    <button class="pill-btn" id="muteBtn">🔊</button>
+    <button class="pill-btn" id="parentBtn">⚙️ להורים</button>
+  </div>
+
+  <!-- ===== ONBOARDING ===== -->
+  <section class="screen" id="scr-onboard">
+    <div class="panel">
+      <div class="hero">
+        <div class="big">🕐</div>
+        <h1>סיפור של יממה</h1>
+        <p class="lead">נלמד לקרוא שעון — ואז לנהל את היום שלך.</p>
+      </div>
+      <div id="obSteps"></div>
+    </div>
+  </section>
+
+  <!-- ===== MAP ===== -->
+  <section class="screen" id="scr-map">
+    <div class="panel">
+      <div id="devBanner"></div>
+      <h2 id="mapTitle">המסע שלי</h2>
+      <p class="lead" id="mapLead">כל תחנה היא שלב. מסיימים אחת — נפתחת הבאה.</p>
+      <div class="map" id="mapGrid"></div>
+      <div class="ladder" id="mapLadder"></div>
+    </div>
+  </section>
+
+  <!-- ===== LEVEL ===== -->
+  <section class="screen" id="scr-level">
+    <div class="panel">
+      <div class="lvl-head">
+        <button class="pill-btn" id="backBtn">▸ חזרה</button>
+        <span class="t" id="lvlTitle"></span>
+      </div>
+      <div class="bar"><i id="lvlBar" style="width:0%"></i></div>
+      <div id="levelBody"></div>
+    </div>
+  </section>
+
+  <!-- ===== TODAY (daily journey) ===== -->
+  <section class="screen" id="scr-today">
+    <div class="panel"><div id="todayBody"></div></div>
+  </section>
+  <!-- ===== WEEK ===== -->
+  <section class="screen" id="scr-week">
+    <div class="panel"><h2>🗓️ השבוע שלי</h2><div id="weekBody"></div></div>
+  </section>
+  <!-- ===== TASKS ===== -->
+  <section class="screen" id="scr-tasks">
+    <div class="panel"><h2>📝 המטלות שלי</h2><div id="tasksBody"></div></div>
+  </section>
+  <!-- ===== WEEKLY PLANNING (gate) ===== -->
+  <section class="screen" id="scr-plan">
+    <div class="panel"><div id="planBody"></div></div>
+  </section>
+
+  <!-- ===== PARENT ===== -->
+  <section class="screen" id="scr-parent">
+    <div class="panel">
+      <h2>לוח הורה</h2>
+      <p class="lead">הגדרות בסיסיות ומעקב. כל הנתונים נשמרים במכשיר הזה בלבד — אין חשבון, אין שרת ואין איסוף מידע.</p>
+      <div id="parentForm"></div>
+      <h2 style="margin-top:20px">התקדמות</h2>
+      <table class="ptable" id="progTable"></table>
+      <div class="btn-row">
+        <button class="btn sun" id="pilotBtn">📤 דוח פיילוט</button>
+        <button class="btn ghost" id="printBtn">הדפסת סדר היום 🖨️</button>
+        <button class="btn ghost" id="resetProg">איפוס התקדמות</button>
+        <button class="btn ghost" id="resetAll">מחיקת כל הנתונים</button>
+        <button class="btn ghost" id="changePin">החלפת קוד הורה 🔑</button>
+      </div>
+      <div class="devbox" id="devBox"></div>
+    </div>
+  </section>
+</div>
+
+<div class="guide"><div class="owl">🦉</div><div class="bubble" id="bubble">שלום! אני טיק־טק.</div></div>
+<div class="modal" id="modal"><div class="box" id="modalBox"></div></div>
+<div class="print-only" id="printSheet"></div>
+
+<script>
+"use strict";
+/* ---------- settings shim used by the shared core ---------- */
+const store={ data:{muted:false}, save(){ try{ DB.data.settings.muted=store.data.muted; DB.save(); }catch(e){} } };
+
+/* ---------- sound ---------- */
+let AC=null;
+function tone(freq, dur=.16, type="sine", gain=.07, delay=0){
+  if(store.data.muted) return;
+  try{
+    AC = AC || new (window.AudioContext||window.webkitAudioContext)();
+    const t0 = AC.currentTime + delay;
+    const o = AC.createOscillator(), g = AC.createGain();
+    o.type=type; o.frequency.value=freq;
+    g.gain.setValueAtTime(0,t0);
+    g.gain.linearRampToValueAtTime(gain,t0+.02);
+    g.gain.exponentialRampToValueAtTime(.0001,t0+dur);
+    o.connect(g); g.connect(AC.destination); o.start(t0); o.stop(t0+dur+.05);
+  }catch(e){}
+}
+const SFX = {
+  ok(){ tone(660,.14,"sine",.07,0); tone(880,.2,"sine",.06,.1); },
+  star(){ [880,1175,1568].forEach((f,i)=>tone(f,.18,"triangle",.05,i*.08)); },
+  oops(){ tone(230,.2,"sine",.05); },
+  tick(){ tone(1200,.04,"square",.025); },
+  win(){ [523,659,784,1047].forEach((f,i)=>tone(f,.3,"triangle",.06,i*.13)); }
+};
+
+/* ---------- helpers ---------- */
+const $  = (s,r=document)=>r.querySelector(s);
+const $$ = (s,r=document)=>[...r.querySelectorAll(s)];
+const pad = n => String(n).padStart(2,"0");
+/* child-facing text is written in the feminine; gx() turns it masculine when the child is a boy */
+const GX_M=[["את יודעת","אתה יודע"],["לא יודעת","לא יודע"],["את קוראת","אתה קורא"],["את קמה","אתה קם"],["את/ה","אתה"],
+  ["בואי","בוא"],["בחרי","בחר"],["גררי","גרור"],["הזיזי","הזז"],["הסתכלי","הסתכל"],["ותראי","ותראה"],["זוכרת","זוכר"],
+  ["כווני","כוון"],["כשתוסיפי","כשתוסיף"],["כתבי","כתוב"],["לחצי","לחץ"],["נחשי","נחש"],["נסי","נסה"],["ספרי","ספור"],
+  ["קבעי","קבע"],["שימי","שים"],["תסתכלי","תסתכל"],["בטוחה","בטוח"]];
+const HEB="\u0590-\u05FF";
+const GX_RE=GX_M.map(([f,m])=>[new RegExp("(^|[^"+HEB+"])"+f.replace("/","\\/")+"(?!["+HEB+"])","g"),m]);
+function gx(s){
+  if(typeof s!=="string") return s;
+  let g="f"; try{ g=DB.data.child.gender||"f"; }catch(e){}
+  if(g!=="m") return s.replace(/את\/ה/g,"את");
+  for(const [re,m] of GX_RE) s=s.replace(re,(all,pre)=>pre+m);
+  return s;
+}
+const el = (tag, cls, html)=>{ const n=document.createElement(tag); if(cls)n.className=cls; if(html!=null)n.innerHTML=gx(html);
+  if(cls==="q" && "speechSynthesis" in window){ try{ if(voiceMode()!=="off"){
+    const b=document.createElement("button"); b.className="say-btn"; b.type="button"; b.textContent="🔊"; b.title="הקראה";
+    b.onclick=e=>{ e.stopPropagation(); speak(n.textContent.replace("🔊",""),true); }; n.appendChild(b); } }catch(e){} }
+  return n; };
+
+const HNAME = ["שתים־עשרה","אחת","שתיים","שלוש","ארבע","חמש","שש","שבע","שמונה","תשע","עשר","אחת־עשרה"];
+function partOfDay(h){
+  if(h===0) return "בלילה";
+  if(h<5) return "לפנות בוקר";
+  if(h<12) return "בבוקר";
+  if(h===12) return "בצהריים";
+  if(h<18) return "אחר הצהריים";
+  if(h<21) return "בערב";
+  return "בלילה";
+}
+function words(h,m){
+  if(h===0&&m===0) return "חצות — יום חדש מתחיל";
+  if(h===12&&m===0) return "שתים־עשרה בצהריים";
+  const n = HNAME[h%12], p = partOfDay(h);
+  if(m===0)  return n+" "+p;
+  if(m===15) return n+" ורבע "+p;
+  if(m===30) return n+" וחצי "+p;
+  if(m===45) return "רבע ל"+HNAME[(h+1)%12]+" "+partOfDay((h+1)%24);
+  return n+" ו־"+m+" דקות "+p;
+}
+function say(text){
+  const b=$("#bubble"); b.textContent=gx(text);
+  try{ if(voiceMode()==="auto") speak(b.textContent); }catch(e){}
+  b.classList.remove("pop"); void b.offsetWidth; b.classList.add("pop");
+}
+function toast(text, bad=false){
+  const t=el("div","toast"+(bad?" oops":""),text); document.body.appendChild(t);
+  setTimeout(()=>t.remove(),2000);
+}
+function confetti(){
+  const chars=["⭐","🌟","✨","🎉","🌙","☀️"];
+  for(let i=0;i<26;i++){
+    const c=el("div","confetti",chars[i%chars.length]);
+    c.style.left=Math.random()*100+"vw";
+    c.style.animationDuration=(1.8+Math.random()*1.6)+"s";
+    c.style.animationDelay=(Math.random()*.5)+"s";
+    document.body.appendChild(c); setTimeout(()=>c.remove(),4200);
+  }
+}
+const SVGNS="http://www.w3.org/2000/svg";
+function svgEl(t,attrs){ const n=document.createElementNS(SVGNS,t); for(const k in attrs) n.setAttribute(k,attrs[k]); return n; }
+function polar(cx,cy,r,deg){ const a=(deg-90)*Math.PI/180; return [cx+r*Math.cos(a), cy+r*Math.sin(a)]; }
+
+/* =====================================================================
+   CLOCK
+   ===================================================================== */
+class Clock{
+  constructor(host,{interactive=true, inner=true, onSettle=null, readout=true, lap=true}={}){
+    this.host=host; this.interactive=interactive; this.onSettle=onSettle;
+    this.h=7; this.m=0; this.drag=null;
+    host.classList.add("clock-wrap"); host.innerHTML="";
+
+    const svg=svgEl("svg",{viewBox:"0 0 300 300"}); this.svg=svg;
+    svg.appendChild(svgEl("circle",{cx:150,cy:150,r:144,fill:"#f4f7ff"}));
+    svg.appendChild(svgEl("circle",{cx:150,cy:150,r:136,fill:"#fff",stroke:"#dde4f7","stroke-width":4}));
+
+    for(let i=0;i<60;i++){
+      const big=i%5===0, [x1,y1]=polar(150,150,big?126:130,i*6), [x2,y2]=polar(150,150,134,i*6);
+      svg.appendChild(svgEl("line",{x1,y1,x2,y2,stroke:big?"#9fb0da":"#dde4f7","stroke-width":big?3.5:2,"stroke-linecap":"round"}));
+    }
+    for(let n=1;n<=12;n++){
+      const [x,y]=polar(150,150,108,n*30);
+      const t=svgEl("text",{x,y,"text-anchor":"middle","dominant-baseline":"central","font-size":27,"font-weight":900,fill:"#1d2246","font-family":"Rubik, sans-serif"});
+      t.textContent=n; svg.appendChild(t);
+      if(inner){
+        const [xi,yi]=polar(150,150,80,n*30);
+        const ti=svgEl("text",{x:xi,y:yi,"text-anchor":"middle","dominant-baseline":"central","font-size":15,"font-weight":700,fill:"#b0485e","font-family":"Rubik, sans-serif"});
+        ti.textContent=n+12; svg.appendChild(ti);
+      }
+    }
+
+    this.hourG=svgEl("g",{class:"hand"});
+    this.hourG.appendChild(svgEl("line",{x1:150,y1:162,x2:150,y2:76,stroke:"var(--hour)","stroke-width":14,"stroke-linecap":"round"}));
+    this.hourG.appendChild(svgEl("circle",{cx:150,cy:76,r:11,fill:"var(--hour)"}));
+    this.hourG.appendChild(svgEl("circle",{class:"knob",cx:150,cy:88,r:34,fill:"#000"}));
+    svg.appendChild(this.hourG);
+
+    this.minG=svgEl("g",{class:"hand"});
+    this.minG.appendChild(svgEl("line",{x1:150,y1:164,x2:150,y2:38,stroke:"var(--minute)","stroke-width":8,"stroke-linecap":"round"}));
+    this.minG.appendChild(svgEl("circle",{cx:150,cy:38,r:9,fill:"var(--minute)"}));
+    this.minG.appendChild(svgEl("circle",{class:"knob",cx:150,cy:48,r:28,fill:"#000"}));
+    svg.appendChild(this.minG);
+
+    svg.appendChild(svgEl("circle",{cx:150,cy:150,r:9,fill:"#1d2246"}));
+    host.appendChild(svg);
+
+    if(readout){
+      const ro=el("div","readout");
+      this.dig=el("div","digital","07:00"); this.wrd=el("div","words","");
+      ro.append(this.dig,this.wrd); host.appendChild(ro);
+    }
+    if(interactive && lap){
+      const lap=el("div","lap");
+      this.amBtn=el("button",null,"🌅 לפני הצהריים · 00–11");
+      this.pmBtn=el("button",null,"🌇 אחרי הצהריים · 12–23");
+      this.amBtn.onclick=()=>this.setLap("am"); this.pmBtn.onclick=()=>this.setLap("pm");
+      lap.append(this.amBtn,this.pmBtn); host.appendChild(lap);
+    }
+    if(interactive){
+
+      const nudge=el("div","nudge");
+      nudge.append(this.mkGroup("שעה",1), this.mkGroup("דקות",5));
+      host.appendChild(nudge);
+      this.bindDrag();
+    }
+    if(!interactive) host.classList.add("static");
+    this.render();
+  }
+  mkGroup(label,step){
+    const g=el("div","ngroup");
+    const minus=el("button",null,"−"), plus=el("button",null,"+"), s=el("span",null,label);
+    const bump=(dir)=>{
+      if(step===1) this.h=(this.h+dir+24)%24;
+      else { this.m=(this.m+dir*step+60)%60; }
+      SFX.tick(); this.render(); this.settle();
+    };
+    minus.onclick=()=>bump(-1); plus.onclick=()=>bump(1);
+    g.append(minus,s,plus); return g;
+  }
+  setLap(l){
+    const h12=this.h%12;
+    this.h = l==="am" ? h12 : h12+12;
+    SFX.tick(); this.render(); this.settle();
+  }
+  bindDrag(){
+    const start=(which)=>(e)=>{
+      if(!this.interactive) return;
+      e.preventDefault(); this.drag=which;
+      (which==="h"?this.hourG:this.minG).classList.add("dragging");
+      this.svg.setPointerCapture?.(e.pointerId);
+    };
+    this.hourG.addEventListener("pointerdown",start("h"));
+    this.minG.addEventListener("pointerdown",start("m"));
+    this.svg.addEventListener("pointermove",(e)=>{
+      if(!this.drag) return;
+      const r=this.svg.getBoundingClientRect();
+      const dx=(e.clientX-r.left)-r.width/2, dy=(e.clientY-r.top)-r.height/2;
+      if(Math.hypot(dx,dy)<14) return;
+      let a=Math.atan2(dx,-dy)*180/Math.PI; if(a<0)a+=360;
+      if(this.drag==="h"){
+        const h12=Math.round(a/30)%12;
+        const pm=this.h>=12;
+        const nh=pm?h12+12:h12;
+        if(nh!==this.h){ this.h=nh; SFX.tick(); }
+      }else{
+        const nm=(Math.round(a/30)*5)%60;
+        if(nm!==this.m){ this.m=nm; SFX.tick(); }
+      }
+      this.render();
+    });
+    const end=()=>{
+      if(!this.drag) return;
+      this.hourG.classList.remove("dragging"); this.minG.classList.remove("dragging");
+      this.drag=null; this.settle();
+    };
+    this.svg.addEventListener("pointerup",end);
+    this.svg.addEventListener("pointercancel",end);
+    window.addEventListener("pointerup",end);
+  }
+  settle(){ this.onSettle && this.onSettle(this.h,this.m); }
+  set(h,m=0,fire=false){ this.h=((h%24)+24)%24; this.m=((m%60)+60)%60; this.render(); if(fire) this.settle(); }
+  render(){
+    const ha=((this.h%12)+this.m/60)*30, ma=this.m*6;
+    this.hourG.setAttribute("transform",`rotate(${ha} 150 150)`);
+    this.minG.setAttribute("transform",`rotate(${ma} 150 150)`);
+    if(this.dig){ this.dig.textContent=pad(this.h)+":"+pad(this.m); this.wrd.textContent=words(this.h,this.m); }
+    if(this.amBtn){
+      const pm=this.h>=12;
+      this.amBtn.classList.toggle("on",!pm); this.pmBtn.classList.toggle("on",pm);
+    }
+  }
+}
+
+/* mini static clock for the printable schedule */
+function miniClock(h,m,size=64){
+  const ha=((h%12)+m/60)*30, ma=m*6;
+  const night = (h>=20||h<6);
+  return `<svg viewBox="0 0 100 100" width="${size}" height="${size}">
+    <circle cx="50" cy="50" r="47" fill="${night?"#1d2b63":"#fff8e1"}" stroke="#1d2246" stroke-width="3"/>
+    ${[12,3,6,9].map(n=>{const[x,y]=polar(50,50,36,n*30);return `<text x="${x}" y="${y}" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="700" fill="${night?"#cfe0ff":"#1d2246"}" font-family="Rubik, sans-serif">${n}</text>`;}).join("")}
+    <g transform="rotate(${ha} 50 50)"><line x1="50" y1="55" x2="50" y2="28" stroke="#ef5d4e" stroke-width="6" stroke-linecap="round"/></g>
+    <g transform="rotate(${ma} 50 50)"><line x1="50" y1="56" x2="50" y2="15" stroke="#2f6fd0" stroke-width="4" stroke-linecap="round"/></g>
+    <circle cx="50" cy="50" r="4" fill="#1d2246"/>
+  </svg>`;
+}
+
+
+/* =====================================================================
+   DATA  (structure taken from the brief)
+   ===================================================================== */
+const REAL_KEY="yomam.app.v1", DEV_KEY="yomam.app.v1.dev", DEV_FLAG="yomam.app.devmode", PIN_KEY="yomam.app.pin";
+const lsGet=k=>{ try{ return localStorage.getItem(k); }catch(e){ return null; } };
+const lsSet=(k,v)=>{ try{ v==null ? localStorage.removeItem(k) : localStorage.setItem(k,v); }catch(e){} };
+let DEV = lsGet(DEV_FLAG)==="1";          /* tester mode: everything unlocked, writes go to a separate copy */
+let KEY = DEV ? DEV_KEY : REAL_KEY;
+const DEF=()=>({
+  child:{name:"",age:9,grade:0,avatar:"🦊",level:"hands",progress:{},start:"hands"},
+  daily_schedule:[],
+  tasks:[],
+  week:[], events:[], custom_acts:[], weekPlans:{}, daily:{}, skills:{},
+  settings:{muted:false,wake:"07:00",sleep:"21:00",onboarded:false,weeklyGate:{on:false,day:6}}
+});
+const DB={
+  data:DEF(),
+  load(){ try{ const r=localStorage.getItem(KEY); if(!r) return;
+      const p=JSON.parse(r), d=DEF();
+      this.data={...d,...p, child:{...d.child,...(p.child||{})}, settings:{...d.settings,...(p.settings||{})}};
+    }catch(e){} },
+  save(){ try{ localStorage.setItem(KEY,JSON.stringify(this.data)); }catch(e){} }
+};
+DB.load();
+store.data.muted=!!DB.data.settings.muted;
+function setDev(on){
+  if(on===DEV) return;
+  if(on){ DB.save(); const snap=JSON.stringify(DB.data); KEY=DEV_KEY; lsSet(DEV_KEY,snap); DB.load();
+          if(!DB.data.settings.onboarded) makeTestProfile(); }
+  else  { KEY=REAL_KEY; DB.data=DEF(); DB.load(); }
+  DEV=on; lsSet(DEV_FLAG,on?"1":null);
+  if(on) SKIP_TODAY=ymd(todayD());          /* tester lands on the map; ☀️ / ⏩ open the journey */
+  store.data.muted=!!DB.data.settings.muted; paintMute(); paintTop();
+}
+
+const GRADES=[["א׳",6],["ב׳",7],["ג׳",8],["ד׳",9],["ה׳",10],["ו׳",11]];
+const AVATARS=["🦊","🐼","🦉","🐨","🦄","🐧","🐢","🦋"];
+
+const LEVELS=[
+  {id:"line",    nm:"הקו של היממה", ic:"📏", sub:"מ־00:00 עד 23:59"},
+  {id:"digital", nm:"שעון דיגיטלי", ic:"📟", sub:"7:59 ← 8:00"},
+  {id:"twelve",  nm:"12 + 12",      ic:"🔢", sub:"13 זה 1, 14 זה 2"},
+  {id:"day",     nm:"היום שלי",     ic:"📅", sub:"בונים סדר יום"},
+  {id:"cycle",   nm:"עיגול היממה",  ic:"🌗", sub:"הקו נהיה עיגול"},
+  {id:"pie",     nm:"העוגה",        ic:"🥧", sub:"חצי · רבע · שלושה רבעים"},
+  {id:"hands",   nm:"המחוגים",      ic:"🕐", sub:"מי קצר ומי ארוך"},
+  {id:"round",   nm:"שעות עגולות",  ic:"🕖", sub:"7:00 · 8:00"},
+  {id:"half",    nm:"וחצי",         ic:"🕧", sub:"7:30"},
+  {id:"quarter", nm:"רבע ורבע ל",   ic:"🕜", sub:"7:15 · 7:45"},
+  {id:"five",    nm:"קפיצות של 5",  ic:"🕔", sub:"8:05 · 8:25"},
+  {id:"week",    nm:"השבוע",        ic:"🗓️", sub:"א׳ עד ש׳"},
+  {id:"plan",    nm:"מטלות ותכנון", ic:"📝", sub:"מחלקים לשלבים"},
+  {id:"quiz",    nm:"חידון",        ic:"🏅", sub:"הכול ביחד"},
+  {id:"trivia",  nm:"טריוויה של זמן", ic:"🧠", sub:"בונוס · פתוח תמיד", bonus:true}
+];
+const idx = id => LEVELS.findIndex(l=>l.id===id);
+/* 12-hour wording, no part-of-day — for the clock-reading levels */
+function shortWords(h,m){
+  const n=HNAME[h%12];
+  if(m===0) return n; if(m===15) return n+" ורבע"; if(m===30) return n+" וחצי";
+  if(m===45) return "רבע ל"+HNAME[(h+1)%12];
+  return n+" ו־"+m+" דקות";
+}
+const prog = id => DB.data.child.progress[id] || null;
+const known = () => Array.isArray(DB.data.child.known) ? DB.data.child.known : [];
+const isKnown = id => known().includes(id);
+const nextLevel = () => LEVELS.find(l=>!l.bonus && !prog(l.id)?.done && !isKnown(l.id));
+const stars = () => Object.values(DB.data.child.progress).filter(p=>p&&p.done).length;
+
+function levelState(i){
+  const l=LEVELS[i];
+  if(l.bonus) return prog(l.id)?.done ? "done" : "open";
+  if(prog(l.id)?.done) return "done";
+  if(isKnown(l.id)) return "skip";
+  if(DEV) return "open";
+  return nextLevel()?.id===l.id ? "cur" : "lock";
+}
+function markDone(id,score,of){
+  DB.data.child.progress[id]={done:true,score,of,at:new Date().toISOString().slice(0,10)};
+  const nx=nextLevel();
+  DB.data.child.level = nx ? nx.id : "done";
+  DB.save(); paintTop();
+}
+
+/* =====================================================================
+   SHELL
+   ===================================================================== */
+const GATED=["map","level","week","tasks"];
+function go(id){
+  if(GATED.includes(id) && gateActive()){ id="plan"; renderPlan(); }
+  else if(id==="map" && dailyPending()){ id="today"; renderToday(); }
+  $$(".screen").forEach(s=>s.classList.toggle("on", s.id==="scr-"+id));
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+function paintTop(){
+  const c=DB.data.child;
+  $("#avBox").textContent=c.avatar||"🦊";
+  $("#nmBox").textContent=c.name||"שלום!";
+  $("#grBox").textContent=c.grade?("כיתה "+GRADES[c.grade-1][0]):"";
+  $("#starCount").textContent=stars();
+  $("#who").style.display=c.name?"":"none";
+  $("#devPill").hidden=!DEV;
+  const pv = c.grade>=3 || !!prog("week")?.done || !!prog("plan")?.done;
+  $("#weekBtn").hidden=!pv || !DB.data.settings.onboarded; $("#tasksBtn").hidden=!pv || !DB.data.settings.onboarded;
+  document.body.classList.toggle("young", c.grade>0&&c.grade<=2);
+  document.body.classList.toggle("older", c.grade>=5);
+}
+$("#mapBtn").onclick=()=>{ if(!DB.data.settings.onboarded) return go("onboard"); renderMap(); go("map"); };
+$("#backBtn").onclick=()=>{ renderMap(); go("map"); };
+$("#parentBtn").onclick=()=>openParentGate();
+$("#muteBtn").onclick=()=>{ store.data.muted=!store.data.muted; store.save(); paintMute(); if(!store.data.muted) SFX.ok(); };
+function paintMute(){ $("#muteBtn").textContent=store.data.muted?"🔇":"🔊"; }
+
+function modal(html){
+  const m=$("#modal"); $("#modalBox").innerHTML=""; 
+  if(typeof html==="string") $("#modalBox").innerHTML=html; else $("#modalBox").appendChild(html);
+  m.classList.add("on"); return $("#modalBox");
+}
+function closeModal(){ $("#modal").classList.remove("on"); }
+$("#modal").addEventListener("click",e=>{ if(e.target===$("#modal")) closeModal(); });
+
+/* =====================================================================
+   ONBOARDING
+   ===================================================================== */
+let ob={step:0, name:"", gender:"", grade:0, avatar:"🦊", pq:0, pscore:0};
+const PLACE=[{h:4,m:0},{h:7,m:30},{h:9,m:45}];
+function renderOb(){
+  const host=$("#obSteps"); host.innerHTML="";
+  const next=(label,fn,cls="btn go wide")=>{ const r=el("div","btn-row"); const b=el("button",cls,label); b.onclick=fn; r.appendChild(b); host.appendChild(r); return b; };
+
+  if(ob.step===0){
+    host.appendChild(el("p","qmeta","שלב 1 מתוך 3"));
+    host.appendChild(el("p","q","איך קוראים לך?"));
+    const wrap=el("div","hero");
+    const inp=el("input","name-input"); inp.type="text"; inp.placeholder="השם שלי"; inp.value=ob.name;
+    inp.addEventListener("input",()=>ob.name=inp.value.trim());
+    inp.addEventListener("keydown",e=>{ if(e.key==="Enter"&&ob.name){ ob.step=1; renderOb(); } });
+    wrap.appendChild(inp); host.appendChild(wrap);
+    const gr=el("div","pickrow");
+    [["f","👧 בת"],["m","👦 בן"]].forEach(([g,t])=>{
+      const b=el("button","pick"+(ob.gender===g?" on":""),t);
+      b.onclick=()=>{ ob.gender=g; DB.data.child.gender=g; SFX.tick(); renderOb(); };
+      gr.appendChild(b); });
+    host.appendChild(gr);
+    next("ממשיכים ▸",()=>{
+      if(!ob.name){ toast("כתבו את השם",true); return; }
+      if(!ob.gender){ toast("בחרו: בן או בת",true); return; }
+      ob.step=1; renderOb(); });
+    say("לפני שמתחילים — איך קוראים לך?");
+  }
+  else if(ob.step===1){
+    host.appendChild(el("p","qmeta","שלב 2 מתוך 3"));
+    host.appendChild(el("p","q",`באיזו כיתה את/ה, ${ob.name}?`));
+    const row=el("div","pickrow");
+    GRADES.forEach(([g,age],i)=>{
+      const b=el("button","pick"+(ob.grade===i+1?" on":""),"כיתה "+g);
+      b.onclick=()=>{ ob.grade=i+1; SFX.tick(); renderOb(); };
+      row.appendChild(b);
+    });
+    host.appendChild(row);
+    host.appendChild(el("p","lead","לפי הכיתה נדע מאיפה להתחיל — לא נחזור על מה שכבר ידוע לך."));
+    next("ממשיכים ▸",()=>{ if(!ob.grade){ toast("בחרי כיתה",true); return; } ob.step=2; renderOb(); });
+  }
+  else if(ob.step===2){
+    host.appendChild(el("p","qmeta","שלב 3 מתוך 3"));
+    host.appendChild(el("p","q","בחרי דמות"));
+    const row=el("div","pickrow");
+    AVATARS.forEach(a=>{
+      const b=el("button","pick av"+(ob.avatar===a?" on":""),a);
+      b.onclick=()=>{ ob.avatar=a; SFX.tick(); renderOb(); };
+      row.appendChild(b);
+    });
+    host.appendChild(row);
+    next(ob.grade>=3?"מבחן קצר ▸":"מתחילים! ▸",()=>{
+      if(ob.grade>=3){ ob.step=3; ob.pq=0; ob.pscore=0; renderOb(); }
+      else finishOb(decideKnown(ob.grade,0));
+    });
+  }
+  else if(ob.step===3){
+    host.appendChild(el("p","qmeta",`בדיקה קצרה · שאלה ${ob.pq+1} מתוך ${PLACE.length}`));
+    host.appendChild(el("p","q","איזו שעה מראה השעון?"));
+    const t=PLACE[ob.pq];
+    const ch=el("div","clock-wrap"); host.appendChild(ch);
+    const c=new Clock(ch,{interactive:false,inner:false,readout:false});
+    c.set(t.h,t.m);
+    const opts=el("div","opts");
+    const wrong=[{h:t.h,m:(t.m+30)%60},{h:(t.h%12)+1,m:t.m}];
+    [...wrong,{...t}].sort(()=>Math.random()-.5).forEach((o,i)=>{
+      const b=el("button","opt",`<span class="tag">${["א","ב","ג"][i]}</span>${pad(o.h)}:${pad(o.m)} · ${shortWords(o.h,o.m)}`);
+      b.onclick=()=>{
+        const right=(o.h===t.h&&o.m===t.m);
+        if(right){ b.classList.add("good"); ob.pscore++; SFX.ok(); } else { b.classList.add("bad"); SFX.oops(); }
+        setTimeout(()=>{
+          ob.pq++;
+          if(ob.pq<PLACE.length) renderOb();
+          else finishOb(decideKnown(ob.grade,ob.pscore));
+        },700);
+      };
+      opts.appendChild(b);
+    });
+    host.appendChild(opts);
+    host.appendChild(el("p","lead","אין ציון ואין כישלון — זה רק כדי לדעת מאיפה להתחיל."));
+    const out=el("button","btn ghost wide","עוד לא יודעת לקרוא שעון עם מחוגים — נתחיל מההתחלה");
+    out.onclick=()=>finishOb(decideKnown(ob.grade,0));
+    const orow=el("div","btn-row"); orow.appendChild(out); host.appendChild(orow);
+    say("בואי נראה מה כבר ידוע לך. אם לא בטוחה — פשוט נחשי.");
+  }
+}
+/* placement → which skills are already known (skipped, still replayable) */
+function decideKnown(grade,score){
+  if(grade<=2) return [];
+  if(grade<=4) return score===3 ? ["line","digital","twelve","cycle","pie","hands","round","half"]
+                   : score===2 ? ["line","digital","pie","hands","round"] : [];
+  return score===3 ? ["line","digital","twelve","cycle","pie","hands","round","half","quarter"]
+       : score===2 ? ["line","digital","twelve","cycle","pie","hands","round"] : ["line"];
+}
+function finishOb(kn){
+  const c=DB.data.child;
+  c.name=ob.name; c.gender=ob.gender||"f"; c.grade=ob.grade; c.age=GRADES[ob.grade-1][1]; c.avatar=ob.avatar;
+  c.known=kn; const start=nextLevel().id; c.start=start; c.level=start;
+  DB.data.settings.onboarded=true;
+  DB.data.settings.weeklyGate={on:ob.grade===6, day:6};
+  DB.data.settings.voice = ob.grade<=2 ? "auto" : "button";
+  (DB.data.daily=DB.data.daily||{})[ymd(todayD())]={done:true,type:"onboarding",week:weekKey()};
+  DB.save();
+  if(DB.data.settings.consent===undefined) setTimeout(()=>{ try{ askConsent(); }catch(e){} },2500);
+  paintTop(); SFX.win(); confetti();
+  const L=LEVELS[idx(start)];
+  const host=$("#obSteps"); host.innerHTML="";
+  host.appendChild(el("div","hero",`<div class="big">${c.avatar}</div>`));
+  host.appendChild(el("p","q",`${c.name}, מתחילים מהשלב: ${L.ic} ${L.nm}`));
+  host.appendChild(el("p","lead", kn.length
+    ? `דילגנו על ${kn.length} שלבים שכבר ידועים לך. אפשר תמיד לחזור אליהם מהמפה.`
+    : "נתחיל מההתחלה — מהקו של היממה: 24 שעות, מחצות ועד חצות."));
+  const r=el("div","btn-row"); const b=el("button","btn go wide","קדימה למפה ▸");
+  b.onclick=()=>{ renderMap(); go("map"); }; r.appendChild(b); host.appendChild(r);
+  say(`${c.name}, מתחילים מהשלב "${L.nm}".`);
+}
+
+/* =====================================================================
+   MAP
+   ===================================================================== */
+function renderMap(){
+  const c=DB.data.child;
+  $("#mapTitle").textContent = c.name ? `המסע של ${c.name}` : "המסע שלי";
+  const nx=nextLevel();
+  $("#mapLead").textContent = nx ? `השלב הבא: ${nx.nm}. כל שלב שמסיימים מדליק כוכב.`
+                                 : "סיימת את כל השלבים! אפשר לחזור לכל שלב ולשחק שוב.";
+  const db=$("#devBanner"); db.innerHTML="";
+  if(DEV){
+    const off=DB.data.settings.devOffset||0;
+    const bar=el("div","devbar",`<span>🛠️ מצב בודק: כל התחנות פתוחות. הכול נשמר בעותק נפרד — הנתונים האמיתיים לא משתנים.${off?` · 📅 תאריך מדומה: ${dayLabel(ymd(todayD()))} (+${off})`:""}</span>`);
+    const x=el("button","btn ghost","יציאה ממצב בודק"); x.onclick=()=>{ setDev(false); routeHome(); toast("חזרת לנתונים האמיתיים"); };
+    bar.appendChild(x);
+    const tools=el("div","devtools");
+    const gs=el("select"); GRADES.forEach(([g],i)=>{ const o=el("option",null,"כיתה "+g); o.value=i+1; if(c.grade===i+1) o.selected=true; gs.appendChild(o); });
+    gs.onchange=()=>{ c.grade=+gs.value; c.age=GRADES[c.grade-1][1]; DB.save(); renderMap(); toast("כיתה "+GRADES[c.grade-1][0]); };
+    const gn=el("select"); [["f","👧 בת"],["m","👦 בן"]].forEach(([v,t])=>{ const o=el("option",null,t); o.value=v; if((c.gender||"f")===v) o.selected=true; gn.appendChild(o); });
+    gn.onchange=()=>{ c.gender=gn.value; DB.save(); renderMap(); toast(gn.value==="m"?"פנייה: בן":"פנייה: בת"); };
+    const sample=el("button","btn ghost","📦 נתוני דוגמה"); sample.onclick=()=>{ fillSample(); renderMap(); toast("נוספו סדר יום, חוגים, מבחן ועבודה"); };
+    const plan=el("button","btn ghost","🗓️ תכנון שבועי עכשיו"); plan.onclick=()=>{ planStep=0; renderPlan(); go("plan"); };
+    const onb=el("button","btn ghost","🔄 בדיקת מסך הפתיחה"); onb.onclick=()=>{ DB.data=DEF(); DB.save(); ob={step:0,name:"",gender:"",grade:0,avatar:"🦊",pq:0,pscore:0}; paintTop(); renderOb(); go("onboard"); };
+    const wipe=el("button","btn ghost","🧹 איפוס העותק"); wipe.onclick=()=>{ DB.data=DEF(); makeTestProfile(); renderMap(); toast("העותק אופס — פרופיל בדיקה חדש"); };
+    const today=el("button","btn ghost","☀️ מסע היום"); today.onclick=()=>{ TODAY_M=null; renderToday(); go("today"); };
+    const fwd=el("button","btn ghost","⏩ יום קדימה"); fwd.onclick=()=>{ DB.data.settings.devOffset=(DB.data.settings.devOffset||0)+1; DB.save(); TODAY_M=null; SKIP_TODAY=null; renderMap(); go("map"); toast("תאריך מדומה: "+dayLabel(ymd(todayD()))); };
+    tools.append(gs,gn,sample,plan,onb,wipe,today,fwd); bar.appendChild(tools);
+    db.appendChild(bar);
+  }
+  const grid=$("#mapGrid"); grid.innerHTML="";
+  LEVELS.forEach((l,i)=>{
+    const st=levelState(i);
+    const n=el("div","node "+st);
+    const p=prog(l.id);
+    n.innerHTML=`<div class="badge">${l.bonus?"🎁":st==="done"?"⭐":st==="lock"?"🔒":st==="skip"?"✓":st==="open"?"🛠️":"▶"}</div>
+      <div class="ic">${l.ic}</div>${mbar(l.id)}<div class="nm">${l.nm}</div>
+      <div class="st">${st==="open"?(l.bonus?l.sub:"פתוח לבדיקה"):st==="done"&&l.bonus?"שחקו שוב — שאלות חדשות":st==="done"?(p.score!=null?`${p.score}/${p.of} נכונות`:"הושלם")
+        :st==="skip"?"כבר ידוע לך":st==="lock"?"עדיין נעול":l.sub}</div>`;
+    if(st!=="lock") n.onclick=()=>openLevel(l.id);
+    grid.appendChild(n);
+  });
+  const lad=$("#mapLadder");
+  lad.innerHTML = `מסלול: ` + LEVELS.filter(l=>!l.bonus).map((l)=>{ const i=idx(l.id);
+    const st=levelState(i);
+    return `<span style="color:${st==="done"?"var(--ok)":st==="cur"?"var(--ink)":"var(--lock)"}">${l.nm}</span>`;
+  }).join(" ← ");
+  paintTop();
+}
+
+/* =====================================================================
+   LEVEL SHELL
+   ===================================================================== */
+let LV={id:null,i:0,n:0,score:0};
+function openLevel(id){
+  LV={id,i:0,n:0,score:0,skill:SKILL_OF[id]||null};
+  $("#lvlTitle").textContent=LEVELS[idx(id)].ic+" "+LEVELS[idx(id)].nm;
+  setBar(0);
+  go("level");
+  ({hands:lvHands, round:()=>lvClock("round"), half:()=>lvClock("half"),
+    quarter:()=>lvClock("quarter"), five:()=>lvClock("five"),
+    cycle:lvCycle, twelve:lvTwelve, day:lvDay, digital:lvDigital, quiz:lvQuiz,
+    line:lvLine, pie:lvPie, week:lvWeek, plan:lvPlanLearn, trivia:lvTrivia})[id]();
+}
+function setBar(p){ $("#lvlBar").style.width=Math.round(p*100)+"%"; }
+function levelDone(msg){
+  markDone(LV.id, LV.score||null, LV.n||null);
+  try{ cloudSync("station",true); }catch(e){}
+  setBar(1); SFX.win(); confetti();
+  const host=$("#levelBody");
+  const box=el("div","good-box", msg);
+  const fact=FACTS[LV.id];
+  const r=el("div","btn-row");
+  const nx=nextLevel();
+  if(nx){ const b=el("button","btn go",`לשלב הבא: ${nx.nm} ▸`); b.onclick=()=>openLevel(nx.id); r.appendChild(b); }
+  const m=el("button","btn ghost","חזרה למפה"); m.onclick=()=>{ renderMap(); go("map"); }; r.appendChild(m);
+  host.appendChild(box);
+  if(fact) host.appendChild(el("div","hint","💡 הידעת? "+fact));
+  const ms=((DB.data.skills||{})[SKILL_OF[LV.id]]||{}).score;
+  const firstRate = (LV.n && LV.score!=null) ? LV.score/LV.n : null;
+  if((firstRate!=null && firstRate<0.6) || (ms!=null && ms<60 && struggling(SKILL_OF[LV.id]))){
+    const ex=exampleCard(SKILL_OF[LV.id],"זה עוד קצת קשה — הנה דוגמה קטנה, ונחזור על זה במסע היום הבא:");
+    host.appendChild(ex || el("div","hint","💪 נחזור על זה במסע היום הבא — ככה זה נשאר בזיכרון.")); }
+  host.appendChild(r);
+  say(msg);
+}
+
+/* ---------- level: the hands ---------- */
+const HAND_TASKS=[
+  {ask:"זוכרת את העוגה? עכשיו יש לה שני מחוגים. הקצר והאדום — מחוג השעות. הזיזי אותו ל־3 (והארוך נשאר על ה־12).", h:3, m:0,
+   hint:"גררי את המחוג האדום עד שהוא מצביע בדיוק על המספר 3."},
+  {ask:"המחוג הארוך והכחול הוא מחוג הדקות. כווני את השעון ל־6:00.", h:6, m:0,
+   hint:"האדום על ה־6, והכחול על ה־12 — כשהכחול על 12, השעה עגולה."},
+  {ask:"עכשיו הזיזי את מחוג הדקות ל־30 (חצי שעה אחרי 6).", h:6, m:30,
+   hint:"חצי שעה = המחוג הכחול מצביע על ה־6 למטה."},
+  {ask:"כווני את השעון ל־9:00.", h:9, m:0, hint:"האדום על ה־9, הכחול על ה־12."}
+];
+function lvHands(){
+  const host=$("#levelBody"); host.innerHTML="";
+  const grid=el("div","task-grid");
+  const left=el("div"), right=el("div","clock-wrap");
+  grid.append(left,right); host.appendChild(grid);
+  const clock=new Clock(right,{interactive:true,inner:false,readout:false,lap:false,onSettle:check});
+  clock.set(12,0);
+  let hintT=null;
+  function draw(){
+    const t=HAND_TASKS[LV.i];
+    left.innerHTML="";
+    left.appendChild(el("p","qmeta",`משימה ${LV.i+1} מתוך ${HAND_TASKS.length}`));
+    left.appendChild(el("p","q",t.ask));
+    const hb=el("button","btn ghost","רמז 💡");
+    hb.onclick=()=>say("💡 "+t.hint);
+    const r=el("div","btn-row"); r.appendChild(hb); left.appendChild(r);
+    setBar(LV.i/HAND_TASKS.length); say(t.ask);
+  }
+  function check(h,m){
+    const t=HAND_TASKS[LV.i]; clearTimeout(hintT);
+    if(h%12===t.h%12 && m===t.m){ track("hands",true,false,0,0);
+      SFX.ok(); LV.i++;
+      if(LV.i>=HAND_TASKS.length){ LV.score=HAND_TASKS.length; LV.n=HAND_TASKS.length; host.innerHTML="";
+        return levelDone("יפה! את יודעת מי מחוג השעות ומי מחוג הדקות, ואיך להזיז אותם."); }
+      setTimeout(draw,600);
+    }else{
+      hintT=setTimeout(()=>say("💡 "+HAND_TASKS[LV.i].hint),2500);
+    }
+  }
+  draw();
+}
+
+/* ---------- levels: reading & setting the clock ---------- */
+const POOL={round:[0], half:[0,30], quarter:[0,15,30,45], five:[0,5,10,15,20,25,30,35,40,45,50,55]};
+function genTime(mode){
+  const p=POOL[mode], m=p[Math.floor(Math.random()*p.length)];
+  const h=1+Math.floor(Math.random()*12);
+  return (mode!=="round"&&m===0) ? genTime(mode) : {h,m};
+}
+function lvClock(mode){
+  const host=$("#levelBody"); host.innerHTML="";
+  const N=6; LV.n=N;
+  const grid=el("div","task-grid");
+  const left=el("div"), right=el("div","clock-wrap");
+  grid.append(left,right); host.appendChild(grid);
+  let clock=null, target=null, mistakes=0, hintT=null, qStart=0;
+
+  function fresh(interactive){
+    right.innerHTML="";
+    clock=new Clock(right,{interactive,inner:false,readout:false,lap:false,onSettle:interactive?checkSet:null});
+  }
+  function draw(){
+    if(LV.i>=N){ host.innerHTML=""; 
+      return levelDone(`סיימת את השלב! ${LV.score} מתוך ${N} בניסיון ראשון.`); }
+    setBar(LV.i/N); mistakes=0; left.innerHTML="";
+    target=genTime(mode); qStart=Date.now();
+    const isRead = LV.i%2===0;
+    left.appendChild(el("p","qmeta",`משימה ${LV.i+1} מתוך ${N}`));
+    if(isRead){
+      fresh(false); clock.set(target.h,target.m);
+      left.appendChild(el("p","q","איזו שעה מראה השעון?"));
+      const opts=el("div","opts");
+      const alts=[];
+      while(alts.length<2){
+        const a=genTime(mode);
+        if(!(a.h===target.h&&a.m===target.m) && !alts.some(x=>x.h===a.h&&x.m===a.m)) alts.push(a);
+      }
+      [...alts,target].sort(()=>Math.random()-.5).forEach((o,i)=>{
+        const b=el("button","opt",`<span class="tag">${["א","ב","ג"][i]}</span>${pad(o.h)}:${pad(o.m)} · ${shortWords(o.h,o.m)}`);
+        b.onclick=()=>{
+          if(o.h===target.h&&o.m===target.m){
+            b.classList.add("good"); SFX.ok(); track("read_"+mode,!mistakes,false,mistakes,(Date.now()-qStart)/1000);
+            if(!mistakes) LV.score++; LV.i++; setTimeout(draw,750);
+          }else{
+            b.classList.add("bad"); SFX.oops(); mistakes++;
+            say(mistakes===1 ? "כמעט. הסתכלי קודם על המחוג הקצר — על איזה מספר הוא עבר?"
+                             : `רמז: המחוג הקצר אחרי ה־${target.h}, והארוך מראה ${target.m} דקות.`);
+            setTimeout(()=>b.classList.remove("bad"),800);
+          }
+        };
+        opts.appendChild(b);
+      });
+      left.appendChild(opts);
+      say("איזו שעה מראה השעון?");
+    }else{
+      fresh(true);
+      const s=genTime(mode); clock.set(s.h===target.h?(s.h%12)+1:s.h, 0);
+      left.appendChild(el("p","q",`כווני את השעון ל־${pad(target.h)}:${pad(target.m)} — ${shortWords(target.h,target.m)}`));
+      const hb=el("button","btn ghost","רמז 💡");
+      hb.onclick=()=>{ mistakes++; say(hintFor(target)); };
+      const r=el("div","btn-row"); r.appendChild(hb); left.appendChild(r);
+      say(`כווני את השעון ל־${shortWords(target.h,target.m)}.`);
+    }
+  }
+  function hintFor(t){
+    if(t.m===0) return `💡 המחוג הקצר על ה־${t.h}, והארוך על ה־12.`;
+    if(t.m===30) return `💡 המחוג הארוך על ה־6 (חצי סיבוב), והקצר בדיוק באמצע הדרך אחרי ה־${t.h}.`;
+    if(t.m===15) return `💡 רבע שעה = המחוג הארוך על ה־3.`;
+    if(t.m===45) return `💡 רבע ל = המחוג הארוך על ה־9, והקצר כמעט הגיע ל־${(t.h%12)+1}.`;
+    return `💡 כל מספר בשעון = 5 דקות. ${t.m} דקות = המחוג הארוך על ה־${t.m/5}.`;
+  }
+  function checkSet(h,m){
+    clearTimeout(hintT);
+    if(h%12===target.h%12 && m===target.m){
+      SFX.ok(); track("set_clock",!mistakes,mistakes>0,mistakes,(Date.now()-qStart)/1000);
+      if(!mistakes) LV.score++; LV.i++; setTimeout(draw,700);
+    }else hintT=setTimeout(()=>{ mistakes++; say(hintFor(target)); },2600);
+  }
+  if(mode==="half"||mode==="quarter") pieIntro(mode,()=>{ host.innerHTML=""; host.appendChild(grid); draw(); });
+  else draw();
+}
+
+/* =====================================================================
+   LEVEL: day & night (24h ring, sky, midnight)
+   ===================================================================== */
+function hourColor(h){
+  if(h>=7&&h<=16) return "#7cc8f7"; if(h===6) return "#ffc98a"; if(h===17) return "#ffb97a";
+  if(h===18) return "#f0875a"; if(h===19) return "#b4669b"; if(h===20) return "#5b4590"; return "#22305f";
+}
+function buildRing(host,onPick){
+  const svg=svgEl("svg",{viewBox:"0 0 340 340"}); host.appendChild(svg);
+  const cx=170,cy=170,R=150,r=92, segs=[];
+  for(let h=0;h<24;h++){
+    const a0=(h-12)*15-7.5, a1=a0+15;
+    const [x1,y1]=polar(cx,cy,R,a0),[x2,y2]=polar(cx,cy,R,a1),[x3,y3]=polar(cx,cy,r,a1),[x4,y4]=polar(cx,cy,r,a0);
+    const p=svgEl("path",{d:`M${x1} ${y1} A${R} ${R} 0 0 1 ${x2} ${y2} L${x3} ${y3} A${r} ${r} 0 0 0 ${x4} ${y4} Z`,
+      class:"seg",fill:hourColor(h),stroke:"rgba(255,255,255,.55)","stroke-width":1.2});
+    svg.appendChild(p); segs[h]=p;
+    if(onPick) p.addEventListener("click",()=>onPick(h));
+    if(h%3===0){ const [tx,ty]=polar(cx,cy,R+15,a0+7.5);
+      const t=svgEl("text",{x:tx,y:ty,"text-anchor":"middle","dominant-baseline":"central","font-size":14,"font-weight":800,fill:"#5b6189","font-family":"Rubik, sans-serif"});
+      t.textContent=pad(h); svg.appendChild(t); }
+  }
+  svg.appendChild(svgEl("circle",{cx,cy,r:82,fill:"#fff"}));
+  const sun=svgEl("text",{x:cx,y:cy-116,"text-anchor":"middle","font-size":20}); sun.textContent="☀️";
+  const moon=svgEl("text",{x:cx,y:cy+124,"text-anchor":"middle","font-size":20}); moon.textContent="🌙";
+  const ic=svgEl("text",{x:cx,y:cy-16,"text-anchor":"middle","dominant-baseline":"central","font-size":32});
+  const tm=svgEl("text",{x:cx,y:cy+22,"text-anchor":"middle","dominant-baseline":"central","font-size":27,"font-weight":900,fill:"#1d2246","font-family":"Rubik, sans-serif"});
+  svg.append(sun,moon,ic,tm);
+  return function hl(h){
+    segs.forEach(s=>s.classList.remove("hot")); segs[h].classList.add("hot");
+    const night=(h>=20||h<6); ic.textContent=night?"🌙":"☀️"; tm.textContent=pad(h)+":00";
+  };
+}
+function skyFor(h){
+  if(h<5) return ["#0d1838","#22305f"]; if(h<7) return ["#2b2a60","#f2a86d"]; if(h<10) return ["#6fc0f3","#d6efff"];
+  if(h<16) return ["#3fa9f5","#bfe8ff"]; if(h<18) return ["#71b9e6","#ffd9a0"]; if(h<20) return ["#ef8358","#6a4b9c"];
+  if(h<22) return ["#3b2f6e","#182045"]; return ["#0d1838","#22305f"];
+}
+function lvCycle(){
+  const host=$("#levelBody"); host.innerHTML="";
+  host.appendChild(el("p","lead","זוכרת את הקו של היממה? מקפלים אותו לעיגול — ומקבלים את עיגול היממה: למעלה יום, למטה לילה, ובתחתית — חצות."));
+  const sky=el("div","sky",'<span class="orb">🌙</span><span class="sky-label"></span>');
+  for(let i=0;i<12;i++){ const t=el("span","twinkle"); t.style.right=(4+Math.random()*92)+"%"; t.style.top=(8+Math.random()*60)+"%"; sky.appendChild(t); }
+  host.appendChild(sky);
+  const paintSky=(h,m)=>{
+    const [a,b]=skyFor(h); sky.style.background=`linear-gradient(170deg,${a},${b})`;
+    const night=(h>=20||h<6); sky.classList.toggle("is-night",night);
+    const orb=sky.querySelector(".orb"); orb.textContent=night?"🌙":"☀️";
+    orb.style.right=(((h*60+m)/1440)*100)+"%";
+    sky.querySelector(".sky-label").textContent=words(h,m);
+  };
+  const grid=el("div","task-grid"), left=el("div"), right=el("div");
+  grid.append(left,right); host.appendChild(grid);
+  const STEPS=[{k:"dn",h:22,a:"night"},{k:"dn",h:13,a:"day"},
+    {k:"tap",h:0,q:"לחצי בעיגול על השעה שבה מתחיל היום — 00:00.",hint:"רמז: למטה, באמצע העיגול — איפה שהירח."},
+    {k:"tap",h:7,q:"לחצי בעיגול על השעה שבה קמים — 07:00.",hint:"רמז: בצד שמאל של העיגול, קצת מעל האמצע — שם השמש זורחת."},
+    {k:"quiz"}];
+  LV.n=STEPS.length;
+  let mistakes=0, cur=null;
+  const rp=el("div","ring-panel"); right.appendChild(rp);
+  const hl=buildRing(rp,h=>{
+    paintSky(h,0); hl(h);
+    if(!cur||cur.k!=="tap") return;
+    if(h===cur.h){ SFX.ok(); track("day_night",!mistakes,false,mistakes,0); if(!mistakes) LV.score++; const k=cur.h; cur=null;
+      say(k===0?"נכון! 00:00 — חצות. כאן מתחיל היום וכאן הוא גם נגמר.":"נכון! 07:00 — השמש עולה ומתעוררים."); LV.i++; setTimeout(draw,900); }
+    else { SFX.oops(); mistakes++; say(cur.hint); }
+  });
+  function draw(){
+    if(LV.i>=STEPS.length){ grid.remove();
+      return levelDone("גילית שהקו של היממה הוא גם עיגול: 24 שעות, למעלה יום, למטה לילה, ובחצות מתחיל יום חדש."); }
+    setBar(LV.i/STEPS.length); left.innerHTML=""; mistakes=0; cur=STEPS[LV.i];
+    left.appendChild(el("p","qmeta",`משימה ${LV.i+1} מתוך ${STEPS.length}`));
+    const next=first=>{ if(first) LV.score++; LV.i++; setTimeout(draw,750); };
+    if(cur.k==="dn"){
+      hl(cur.h); paintSky(cur.h,0);
+      left.appendChild(el("p","q",`השעה ${pad(cur.h)}:00 — יום או לילה?`));
+      mcq(left,[["☀️ יום",cur.a==="day"],["🌙 לילה",cur.a==="night"]],
+          `רמז: ${pad(cur.h)}:00 נמצא ב${cur.a==="day"?"חצי העליון — שם השמש":"חצי התחתון — שם הירח"}.`,next);
+      say("למעלה יום, למטה לילה. מה התשובה?");
+    }else if(cur.k==="tap"){
+      left.appendChild(el("p","q",cur.q)); say(cur.q);
+    }else{
+      left.appendChild(el("p","q","איזו שעה מתחיל יום חדש?"));
+      mcq(left,[["12:00 בצהריים",false],["00:00 בלילה — חצות",true],["06:00 בבוקר",false]],
+          "רמז: היום החדש מתחיל כשחשוך וכולם ישנים.",next);
+    }
+  }
+  draw(); paintSky(22,0);
+}
+
+/* =====================================================================
+   LEVEL: build my day (timeline + clashes + sleep check)
+   ===================================================================== */
+const ACTS=[
+  {id:"wake_up",   nm:"קמים",              e:"🌅", dur:30,  c:"#f0a020", def:"07:00"},
+  {id:"breakfast", nm:"ארוחת בוקר",        e:"🥣", dur:20,  c:"#e5843a", def:"07:20"},
+  {id:"school",    nm:"בית ספר",           e:"🏫", dur:300, c:"#4f7fe0", def:"08:00"},
+  {id:"lunch",     nm:"ארוחת צהריים",      e:"🍲", dur:30,  c:"#3fae7a", def:"13:30"},
+  {id:"homework",  nm:"שיעורי בית",        e:"✏️", dur:45,  c:"#7a5ad6", def:"16:00"},
+  {id:"hobby",     nm:"חוג",               e:"⚽", dur:60,  c:"#2fa7b9", def:"17:00"},
+  {id:"play",      nm:"משחק וזמן חופשי",   e:"🧩", dur:60,  c:"#d9609a", def:"18:00"},
+  {id:"dinner",    nm:"ארוחת ערב",         e:"🍽️", dur:40,  c:"#d0683f", def:"19:00"},
+  {id:"shower",    nm:"מקלחת",             e:"🛁", dur:20,  c:"#4f98d8", def:"20:00"},
+  {id:"bedtime",   nm:"הולכים לישון",      e:"🛏️", dur:30,  c:"#3b3170", def:"20:30"},
+  {id:"afterschool",nm:"צהרון",            e:"🧸", dur:180, c:"#c97a2b", def:"13:30"},
+  {id:"tutor",     nm:"מורה פרטית",        e:"👩‍🏫", dur:60,  c:"#8a63d2", def:"16:30"},
+  {id:"youth",     nm:"תנועת נוער",        e:"🏕️", dur:120, c:"#5a8f3a", def:"17:00"}
+];
+const allActs=()=>[...ACTS,...(DB.data.custom_acts||[])];
+const REQUIRED=["wake_up","school","bedtime"];
+const T0=6*60, T1=24*60, ROW=34;
+const toMin=t=>{ const [h,m]=t.split(":").map(Number); return h*60+m; };
+const toHM=n=>pad(Math.floor(n/60)%24)+":"+pad(n%60);
+/* פעילות שנמצאת כולה בתוך פעילות ארוכה יותר אינה התנגשות — זה יום נורמלי.
+   ראיה: ילד כיתה ו׳, 21/11 — ארוחת בוקר ב־10:00 בתוך בית ספר חסמה את הסיום. */
+const span=x=>{ const s=toMin(x.time); return [s, s+x.duration_minutes]; };
+function within(a,b){
+  const [as,ae]=span(a), [bs,be]=span(b);
+  return a.duration_minutes < b.duration_minutes && as>=bs && ae<=be;
+}
+function clashes(list){
+  const bad=new Set();
+  for(let i=0;i<list.length;i++) for(let j=i+1;j<list.length;j++){
+    const a=list[i], b=list[j], [as,ae]=span(a), [bs,be]=span(b);
+    if(!(as<be && bs<ae)) continue;            /* לא נוגעות בכלל */
+    if(within(a,b)||within(b,a)) continue;     /* אחת יושבת כולה בתוך השנייה — בסדר גמור */
+    bad.add(a.activity); bad.add(b.activity);  /* חפיפה חלקית בלבד */
+  }
+  return bad;
+}
+function nesting(list){
+  const inner=new Set(), host=new Set();
+  for(const a of list) for(const b of list) if(a!==b && within(a,b)){ inner.add(a.activity); host.add(b.activity); }
+  return {inner,host};
+}
+function sleepHours(list){
+  const w=list.find(x=>x.activity==="wake_up"), b=list.find(x=>x.activity==="bedtime");
+  if(!w||!b) return null;
+  return ((24*60 - toMin(b.time) - b.duration_minutes) + toMin(w.time))/60;
+}
+function lvDay(){
+  const host=$("#levelBody"); host.innerHTML="";
+  host.appendChild(el("p","lead","בחרי פעילות, קבעי בחצים מתי היא מתחילה — והיא תופיע על ציר היום. פעילות שנמצאת בתוך פעילות אחרת זה בסדר גמור; אם שתיים חופפות רק חלקית, נשאל אותך."));
+  const wrap=el("div","day-wrap"); host.appendChild(wrap);
+  const tl=el("div","timeline"); const side=el("div");
+  wrap.append(tl,side);
+  for(let h=6;h<24;h++){ const r=el("div","trow",`<span class="hr">${pad(h)}:00</span><span class="ln"></span>`); tl.appendChild(r); }
+  const blocks=el("div","blocks"); tl.appendChild(blocks);
+  const bank=el("div","cardbank"); side.appendChild(bank);
+  const sum=el("div","summary"); side.appendChild(sum);
+  const doneRow=el("div","btn-row"); side.appendChild(doneRow);
+  let list=[...(DB.data.daily_schedule||[])].filter(x=>allActs().some(a=>a.id===x.activity));
+  let finished=false;
+
+  function render(){
+    bank.innerHTML="";
+    allActs().forEach(a=>{
+      const used=list.some(x=>x.activity===a.id);
+      const b=el("button","abtn"+(used?" used":""),`<span class="e">${a.e}</span>${a.nm}<span class="dur">${a.dur>=60?(a.dur/60)+" ש׳":a.dur+" ד׳"}</span>`);
+      b.onclick=()=>place(a);
+      bank.appendChild(b);
+    });
+    const mine=el("button","abtn add",'<span class="e">➕</span>פעילות משלי<span class="dur">חוג, תפילה, אימון…</span>');
+    mine.onclick=()=>customActModal(a=>{ render(); place(a); });
+    bank.appendChild(mine);
+    blocks.innerHTML="";
+    const bad=clashes(list), nest=nesting(list);
+    list.forEach(x=>{
+      const a=allActs().find(q=>q.id===x.activity);
+      const s=toMin(x.time);
+      const top=(s-T0)/60*ROW, hgt=Math.max(24,Math.min(x.duration_minutes,(T1-s))/60*ROW);
+      const blk=el("div","blk"+(bad.has(x.activity)?" clash":"")+(nest.inner.has(x.activity)?" nested":"")+(nest.host.has(x.activity)?" host":""),
+        `<span>${a.e}</span><span>${a.nm}</span><small>${x.time}–${toHM(s+x.duration_minutes)}</small><button class="x" title="הסרה">×</button>`);
+      blk.style.top=top+"px"; blk.style.height=hgt+"px"; blk.style.background=a.c;
+      blk.querySelector(".x").onclick=()=>{ list=list.filter(y=>y!==x); save(); render(); SFX.tick(); };
+      blocks.appendChild(blk);
+    });
+    /* summary */
+    sum.innerHTML="";
+    const line=(cls,t)=>sum.appendChild(el("div","sline "+cls,t));
+    line(bad.size?"ask":"ok", bad.size?"🤔 יש פעילויות שחופפות חלקית — מסומנות בכתום. ככה זה באמת אצלך? אפשר להשאיר ככה, ואפשר להזיז.":"✅ היום שלך מסתדר יפה");
+    const sh=sleepHours(list);
+    if(sh==null) line("", "🛏️ כשתוסיפי 'קמים' ו'הולכים לישון' — נחשב כמה שעות שינה יש לך.");
+    else if(sh<9) line("warn",`😴 רק ${sh.toFixed(1).replace(".0","")} שעות שינה. לילדים מומלץ 9–12 שעות — אולי ללכת לישון מוקדם יותר?`);
+    else line("ok",`😴 ${sh.toFixed(1).replace(".0","")} שעות שינה — מצוין!`);
+    const miss=REQUIRED.filter(r=>!list.some(x=>x.activity===r)).map(r=>allActs().find(a=>a.id===r).nm);
+    if(miss.length) line("", "📌 חסר עוד: "+miss.join(", "));
+    doneRow.innerHTML="";
+    const ready=!miss.length;   /* חפיפה אף פעם לא חוסמת את הסיום */
+    const fin=el("button","btn go"+(ready?"":" ghost"), ready?"סיימתי את היום שלי ✓":"סיימתי");
+    fin.onclick=()=>{
+      if(finished){ toast("היום נשמר ✓"); return; }
+      if(!ready){ say(`עוד לא — חסר: ${miss.join(", ")}.`); SFX.oops(); return; }
+      const w=list.find(x=>x.activity==="wake_up"), b=list.find(x=>x.activity==="bedtime");
+      DB.data.settings.wake=w.time; DB.data.settings.sleep=b.time; save();
+      finished=true; LV.n=null; LV.score=null;
+      levelDone("בנית את היום שלך! אפשר להדפיס אותו מלוח ההורה ולתלות על המקרר.");
+    };
+    doneRow.appendChild(fin);
+    setBar(Math.min(1,list.length/6));
+  }
+  function save(){
+    list.sort((a,b)=>toMin(a.time)-toMin(b.time));
+    DB.data.daily_schedule=list.map(x=>({time:x.time,activity:x.activity,duration_minutes:x.duration_minutes}));
+    DB.save();
+  }
+  function place(a){
+    const box=el("div");
+    box.appendChild(el("p","q",`${a.e} ${a.nm} — באיזו שעה זה מתחיל?`));
+    const [dh,dm]=a.def.split(":").map(Number);
+    const c=digiPicker(box,dh,dm);
+    const r=el("div","btn-row");
+    const ok=el("button","btn go","שימי ביום ✓"), cancel=el("button","btn ghost","ביטול");
+    ok.onclick=()=>{
+      const s=c.h*60+c.m;
+      if(s<T0){ toast("הציר מתחיל ב־06:00 — בחרי שעה מאוחרת יותר",true); return; }
+      list.push({time:toHM(s),activity:a.id,duration_minutes:a.dur});
+      save(); closeModal(); render(); SFX.ok();
+      const bad=clashes(list);
+      say(bad.has(a.id) ? `${a.nm} ב־${words(c.h,c.m)}. היא חופפת חלקית לפעילות אחרת — ככה זה אצלך? אפשר להשאיר, ואפשר להזיז עם ×.`
+                        : `${a.nm} ב־${words(c.h,c.m)}. מה עוד קורה ביום שלך?`);
+    };
+    cancel.onclick=closeModal;
+    r.append(ok,cancel); box.appendChild(r);
+    box.appendChild(el("p","lead",`💡 אחרי 12 בצהריים ממשיכים לספור: 13, 14, 15… למשל ארוחת ערב ב־19.`));
+    modal(box);
+  }
+  render();
+  say(list.length?"זה היום ששמרת. אפשר להוסיף, להזיז או להסיר.":"בואי נבנה את היום שלך. מתחילים מ'קמים'?");
+}
+
+/* =====================================================================
+   LEVEL: quiz
+   ===================================================================== */
+function lvQuiz(){
+  const host=$("#levelBody"); host.innerHTML="";
+  const grid=el("div","task-grid"), left=el("div"), right=el("div","clock-wrap");
+  grid.append(left,right); host.appendChild(grid);
+  const reached = ["five","quarter","half","round"].find(m=>prog(m)?.done || isKnown(m)) || "round";
+  const sched=DB.data.daily_schedule||[];
+  const wake=sched.find(x=>x.activity==="wake_up")?.time || "07:00";
+  const pmH=13+Math.floor(Math.random()*9);
+  const Q=[
+    {t:"read"},
+    {t:"mc", q:"באיזו שעה את קמה בבוקר?", o:[[wake,true],[toHM(toMin(wake)+60),false],[toHM(toMin(wake)+12*60),false]],
+     h:"רמז: זו השעה שבחרת בשלב 'היום שלי'."},
+    {t:"mc", q:"כמה שעות יש ביממה?", o:[["12",false],["24",true],["60",false]], h:"רמז: המחוג הקצר מקיף את השעון פעמיים."},
+    {t:"mc", q:`השעה ${pmH}:00 — בוקר, צהריים או ערב?`,
+     o:[["בוקר",false],["אחר הצהריים",pmH<18],["ערב",pmH>=18]], h:"רמז: אחרי 12 בצהריים ממשיכים לספור — 13, 14, 15…"},
+    {t:"mc", q:"מתי מתחיל יום חדש?", o:[["06:00",false],["12:00",false],["00:00 — חצות",true]], h:"רמז: כשחשוך וכולם ישנים."},
+    {t:"mc", q:"השעה 15:00 — על איזה מספר בשעון מצביע המחוג הקצר?", o:[["15",false],["3",true],["5",false]],
+     h:"רמז: 15 פחות 12."},
+    {t:"mc", q:"מה השעה דקה אחרי 07:59?", o:[["07:60",false],["07:00",false],["08:00",true]],
+     h:"רמז: אחרי 59 דקות מתחילה שעה חדשה."},
+    {t:"set"}
+  ];
+  LV.n=Q.length;
+  let clock=null, target=null, mistakes=0;
+  function draw(){
+    if(LV.i>=Q.length){ grid.remove(); return levelDone(`סיימת את החידון עם ${LV.score} מתוך ${Q.length} בניסיון ראשון. כל הכבוד!`); }
+    setBar(LV.i/Q.length); left.innerHTML=""; right.innerHTML=""; mistakes=0;
+    const q=Q[LV.i];
+    left.appendChild(el("p","qmeta",`שאלה ${LV.i+1} מתוך ${Q.length}`));
+    if(q.t==="read"){
+      target=genTime(reached);
+      clock=new Clock(right,{interactive:false,inner:true,readout:false}); clock.set(target.h,target.m);
+      const alts=[]; while(alts.length<2){ const a=genTime(reached); if(!(a.h===target.h&&a.m===target.m)&&!alts.some(x=>x.h===a.h&&x.m===a.m)) alts.push(a); }
+      q.q="איזו שעה מראה השעון?";
+      q.o=[...alts.map(a=>[`${pad(a.h)}:${pad(a.m)} · ${shortWords(a.h,a.m)}`,false]),[`${pad(target.h)}:${pad(target.m)} · ${shortWords(target.h,target.m)}`,true]].sort(()=>Math.random()-.5);
+      q.h="רמז: קודם המחוג הקצר — השעה. אחר כך הארוך — הדקות.";
+    }
+    if(q.t==="set"){
+      target=genTime(reached);
+      clock=new Clock(right,{interactive:true,inner:false,readout:false,lap:false,onSettle:(h,m)=>{
+        if(h%12===target.h%12&&m===target.m){ SFX.ok(); if(!mistakes) LV.score++; LV.i++; setTimeout(draw,800); }
+      }});
+      clock.set((target.h%12)+3,0);
+      left.appendChild(el("p","q",`משימה אחרונה: כווני את השעון ל־${pad(target.h)}:${pad(target.m)}.`));
+      const hb=el("button","btn ghost","רמז 💡"); hb.onclick=()=>{ mistakes++; say(`💡 המחוג הקצר ליד ה־${target.h}, הארוך על ה־${target.m?target.m/5:12}.`); };
+      const r=el("div","btn-row"); r.appendChild(hb); left.appendChild(r);
+      say("משימה אחרונה — כווני את השעון בעצמך.");
+      return;
+    }
+    if(q.t!=="read"){ const w=el("div","hero",`<div class="big">${["","⏰","🌗","🌆","🌙"][LV.i]||"🕐"}</div>`); right.appendChild(w); }
+    left.appendChild(el("p","q",q.q));
+    const opts=el("div","opts");
+    q.o.forEach(([t,ok],i)=>{
+      const b=el("button","opt",`<span class="tag">${["א","ב","ג"][i]}</span>${t}`);
+      b.onclick=()=>{
+        if(ok){ b.classList.add("good"); SFX.ok(); if(!mistakes) LV.score++; LV.i++; setTimeout(draw,700); }
+        else{ b.classList.add("bad"); SFX.oops(); mistakes++; say(q.h); setTimeout(()=>b.classList.remove("bad"),700); }
+      };
+      opts.appendChild(b);
+    });
+    left.appendChild(opts); say(q.q);
+  }
+  draw();
+}
+
+/* =====================================================================
+   PARENT
+   ===================================================================== */
+function renderParent(){
+  const c=DB.data.child, s=DB.data.settings;
+  const f=$("#parentForm"); f.innerHTML="";
+  const row=(label,input)=>{ const r=el("div","field"); r.appendChild(el("label",null,label)); r.appendChild(input); f.appendChild(r); return input; };
+  const nm=el("input"); nm.type="text"; nm.value=c.name||"";
+  row("🧒 שם",nm).onchange=()=>{ c.name=nm.value.trim(); DB.save(); paintTop(); };
+  const gs=el("select"); [["f","בת — פנייה בלשון נקבה"],["m","בן — פנייה בלשון זכר"]].forEach(([v,t])=>{ const o=el("option",null,t); o.value=v; if((c.gender||"f")===v) o.selected=true; gs.appendChild(o); });
+  row("👧👦 בן / בת",gs).onchange=()=>{ c.gender=gs.value; DB.save(); toast("הפנייה עודכנה"); };
+  const vs=el("select"); [["auto","🔊 הקראה אוטומטית (מומלץ לא׳–ב׳)"],["button","רק בלחיצה על 🔊"],["off","כבוי"]].forEach(([v,t])=>{ const o=el("option",null,t); o.value=v; if(voiceMode()===v) o.selected=true; vs.appendChild(o); });
+  row("🗣️ קול",vs).onchange=()=>{ s.voice=vs.value; DB.save(); toast("הגדרת הקול עודכנה"); };
+  const vt=el("div","voicediag"); vt.textContent=voiceDiagnosis();
+  const vr=el("div","btn-row");
+  const tv=el("button","btn ghost","🔊 בדיקת קול");
+  tv.onclick=()=>{
+    loadVoices(); vt.textContent=voiceDiagnosis();
+    if(!VOICE.he) return;
+    let started=false;
+    vt.textContent="⏳ מנסה להקריא…";
+    speak("שלום! אני טיק־טק. השעה שבע וחצי בבוקר.",true,{
+      start:()=>{ started=true; vt.textContent=`✅ הקול עובד (${VOICE.he.name}).`; },
+      error:er=>{ vt.textContent=`❌ ההקראה נכשלה: ${er}. נסו Microsoft Edge.`; } });
+    setTimeout(()=>{ if(!started && !VOICE.lastErr) vt.textContent="⚠️ הדפדפן קיבל את הבקשה אבל לא התחיל להקריא. בדקו שהרמקול לא מושתק, או נסו Microsoft Edge."; },3000);
+  };
+  vr.appendChild(tv); f.appendChild(vt); f.appendChild(vr);
+  if(cloudOn()){
+    const cs=el("select"); [["yes","✅ לשלוח נתונים אנונימיים לפיילוט"],["no","❌ לא לשלוח"]].forEach(([v,t])=>{ const o=el("option",null,t); o.value=v; if((s.consent===true?"yes":"no")===v) o.selected=true; cs.appendChild(o); });
+    row("📡 שיתוף לפיילוט",cs).onchange=()=>{ s.consent=cs.value==="yes"; DB.save(); if(s.consent) cloudSync("parent",true); toast("ההגדרה נשמרה"); };
+  }
+  const gr=el("select"); GRADES.forEach(([g],i)=>{ const o=el("option",null,"כיתה "+g); o.value=i+1; if(c.grade===i+1) o.selected=true; gr.appendChild(o); });
+  row("🎒 כיתה",gr).onchange=()=>{ c.grade=+gr.value; c.age=GRADES[c.grade-1][1]; DB.save(); paintTop(); };
+  const st=el("select"); LEVELS.forEach(l=>{ const o=el("option",null,l.nm); o.value=l.id; if((c.start||"hands")===l.id) o.selected=true; st.appendChild(o); });
+  row("🚩 מתחילים מ־",st).onchange=()=>{
+    c.start=st.value; c.known=LEVELS.slice(0,idx(st.value)).map(l=>l.id);
+    c.level=nextLevel()?.id||"done"; DB.save(); paintTop(); renderParent(); toast("נקודת ההתחלה עודכנה"); };
+  const wk=el("input"); wk.type="time"; wk.value=s.wake;
+  row("🌅 שעת קימה",wk).onchange=()=>{ s.wake=wk.value; syncTime("wake_up",wk.value); };
+  const sl=el("input"); sl.type="time"; sl.value=s.sleep;
+  row("🛏️ שעת שינה",sl).onchange=()=>{ s.sleep=sl.value; syncTime("bedtime",sl.value); };
+  if(!s.weeklyGate) s.weeklyGate={on:false,day:6};
+  const gon=el("select"); [["כבוי","0"],["פעיל — חובה לפני המשחק","1"]].forEach(([t,v])=>{ const o=el("option",null,t); o.value=v; if((s.weeklyGate.on?"1":"0")===v) o.selected=true; gon.appendChild(o); });
+  row("🗓️ תכנון שבועי",gon).onchange=()=>{ s.weeklyGate.on=gon.value==="1"; DB.save(); toast(s.weeklyGate.on?"תכנון שבועי הופעל":"תכנון שבועי כבוי"); paintTop(); };
+  const gd=el("select"); DAYN.forEach((n,i)=>{ const o=el("option",null,"יום "+n); o.value=i; if(s.weeklyGate.day===i) o.selected=true; gd.appendChild(o); });
+  row("📆 יום התכנון",gd).onchange=()=>{ s.weeklyGate.day=+gd.value; DB.save(); toast("יום התכנון עודכן"); };
+  const lastPlan=Object.entries(DB.data.weekPlans||{}).sort().pop();
+  const gn=el("p","lead",`תכנון אחרון: ${lastPlan?new Date(lastPlan[1].at).toLocaleDateString("he-IL"):"עוד לא היה"} · מטלות פתוחות: ${(DB.data.tasks||[]).filter(t=>!t.done).length} · דברים קבועים בשבוע: ${(DB.data.week||[]).length}`);
+  f.appendChild(gn);
+  const gr2=el("div","btn-row"); const now=el("button","btn ghost","פתיחת התכנון השבועי עכשיו");
+  now.onclick=()=>{ planStep=0; renderPlan(); go("plan"); }; gr2.appendChild(now); f.appendChild(gr2);
+
+  const t=$("#progTable");
+  t.innerHTML=`<tr><th>שלב</th><th>מצב</th><th>תוצאה</th><th>תאריך</th></tr>`+
+    LEVELS.map((l,i)=>{ const p=prog(l.id), stt=levelState(i);
+      return `<tr><td>${l.ic} ${l.nm}</td>
+        <td>${p?.done?'<span class="tag-ok">הושלם</span>':stt==="open"?'<span class="tag-no">פתוח (בודק)</span>':stt==="skip"?'<span class="tag-no">דולג — ידוע</span>':stt==="cur"?'<span class="tag-no">פתוח</span>':'<span class="tag-no">נעול</span>'}</td>
+        <td>${p?.done&&p.score!=null?`${p.score}/${p.of} בניסיון ראשון`:"—"}</td><td>${p?.at||"—"}</td></tr>`; }).join("");
+  const weak=LEVELS.filter(l=>{ const p=prog(l.id); return p?.done&&p.of&&p.score/p.of<.6; });
+  const old=$("#parentNote"); if(old) old.remove();
+  const note=el("p","lead", weak.length?`📌 כדאי לחזור על: ${weak.map(l=>l.nm).join(", ")} (פחות מ־60% בניסיון ראשון).`
+                                       : "📌 אין כרגע שלב שדורש חזרה.");
+  note.id="parentNote"; note.style.marginTop="12px"; t.after(note);
+
+  /* mastery per skill + daily journey */
+  let sb=$("#skillBox"); if(!sb){ sb=el("div"); sb.id="skillBox"; }
+  note.after(sb); sb.innerHTML="";
+  sb.appendChild(el("h2",null,"🎯 שליטה במיומנויות"));
+  sb.appendChild(el("p","lead","ציון 0–100 לכל מיומנות. תשובה נכונה בניסיון ראשון שווה יותר מתשובה אחרי רמז או כמה ניסיונות. מיומנות שנשכחת חוזרת לבד במסע היום — אחרי יום, 3 ימים, שבוע ושבועיים."));
+  const SK=Object.entries(DB.data.skills||{}).sort((a,b)=>a[1].score-b[1].score);
+  if(!SK.length) sb.appendChild(el("p","lead","עוד אין נתונים — הם נאספים מכל תשובה."));
+  else{
+    const tb=el("table","ptable skilltbl");
+    const act=sc=>sc>=80?"חזרה מרווחת":sc>=50?"תרגול קרוב":"חזרה מחר, עם דוגמה";
+    tb.innerHTML=`<tr><th>מצב</th><th>מיומנות</th><th>מה המערכת עושה</th><th>חזרה הבאה</th><th>שליטה</th></tr>`+SK.map(([k,v])=>{
+      const nx=v.next? (v.next<=ymd(todayD())?"היום":dayLabel(v.next)) : "—";
+      return `<tr><td class="st-cell">${mLabel(v.score)}</td><td>${SKILLN[k]||k}</td><td>${act(v.score)}</td><td>${nx}</td>
+        <td class="muted"><span class="sb"><i style="width:${v.score}%;background:${mColor(v.score)}"></i></span>${v.score}</td></tr>`; }).join("");
+    sb.appendChild(tb);
+  }
+  const wkKey=weekKey(), dly=Object.values(DB.data.daily||{}).filter(d=>d.done&&d.week===wkKey).length;
+  sb.appendChild(el("p","lead",`☀️ מסע היום: ${dly} מתוך 7 ימים השבוע.`));
+
+  const dv=$("#devBox"); dv.innerHTML="";
+  dv.appendChild(el("h2",null,"🛠️ מצב בודק"));
+  dv.appendChild(el("p","lead", DEV
+    ? "מצב בודק פעיל: כל התחנות פתוחות, וכל מה שנעשה נשמר בעותק נפרד. ביציאה חוזרים לנתונים האמיתיים — בדיוק כמו שהיו."
+    : "פותח את כל התחנות כדי לבדוק כל שלב בלי לעבור את המסלול. הכול נשמר בעותק נפרד, כך שההתקדמות של הילד/ה לא נפגעת."));
+  const tb=el("button", DEV?"btn":"btn sun", DEV?"יציאה ממצב בודק":"כניסה למצב בודק");
+  tb.onclick=()=>{ const on=!DEV; setDev(on); toast(on?"מצב בודק פעיל — כל התחנות פתוחות":"חזרת לנתונים האמיתיים");
+    if(on){ if(DB.data.settings.onboarded){ renderMap(); go("map"); } else { renderOb(); go("onboard"); } }
+    else renderParent(); };
+  const r=el("div","btn-row"); r.appendChild(tb); dv.appendChild(r);
+}
+function routeHome(){ paintTop(); if(DB.data.settings.onboarded){ renderMap(); go("map"); } else { ob={step:0,name:"",gender:"",grade:0,avatar:"🦊",pq:0,pscore:0}; renderOb(); go("onboard"); } }
+
+/* ---------- parent gate: PIN, set up behind an adult-only question ---------- */
+function enterParent(){ closeModal(); renderParent(); go("parent"); }
+function openParentGate(){
+  const pin=lsGet(PIN_KEY);
+  if(!pin) return mathGate("כניסה ראשונה להורים. כדי שרק מבוגר יקבע את הקוד — שאלה קטנה:", ()=>setPin(enterParent));
+  const box=el("div");
+  box.appendChild(el("p","q","🔒 כניסה להורים"));
+  box.appendChild(el("p","lead","הקלידו את קוד ההורה — 4 ספרות."));
+  const inp=el("input","name-input pin"); inp.type="password"; inp.inputMode="numeric"; inp.maxLength=4; inp.autocomplete="off";
+  box.appendChild(inp);
+  const tryIt=()=>{ if(inp.value===pin) enterParent();
+    else { inp.value=""; inp.classList.add("shake"); SFX.oops(); setTimeout(()=>inp.classList.remove("shake"),460); } };
+  inp.addEventListener("keydown",e=>{ if(e.key==="Enter") tryIt(); });
+  const r=el("div","btn-row"); const ok=el("button","btn go","כניסה"), no=el("button","btn ghost","ביטול");
+  ok.onclick=tryIt; no.onclick=closeModal; r.append(ok,no); box.appendChild(r);
+  const forgot=el("button","linkbtn","שכחתי את הקוד");
+  forgot.onclick=()=>mathGate("איפוס קוד הורה — שאלה שרק מבוגר יודע:", ()=>setPin(enterParent));
+  box.appendChild(forgot);
+  modal(box); setTimeout(()=>inp.focus(),50);
+}
+function mathGate(text,then){
+  const a=12+Math.floor(Math.random()*18), b=12+Math.floor(Math.random()*8);
+  const box=el("div");
+  box.appendChild(el("p","q","🔒 "+text));
+  box.appendChild(el("div","gate-q",`${a} × ${b} = ?`));
+  const inp=el("input","name-input pin"); inp.type="text"; inp.inputMode="numeric"; inp.autocomplete="off"; inp.style.letterSpacing="4px";
+  box.appendChild(inp);
+  const tryIt=()=>{ if(+inp.value===a*b) then();
+    else { SFX.oops(); toast("לא נכון — הנה שאלה חדשה",true); mathGate(text,then); } };
+  inp.addEventListener("keydown",e=>{ if(e.key==="Enter") tryIt(); });
+  const r=el("div","btn-row"); const ok=el("button","btn go","המשך"), no=el("button","btn ghost","ביטול");
+  ok.onclick=tryIt; no.onclick=closeModal; r.append(ok,no); box.appendChild(r);
+  modal(box); setTimeout(()=>inp.focus(),50);
+}
+function setPin(then){
+  const box=el("div");
+  box.appendChild(el("p","q","🔑 בחרו קוד הורה"));
+  box.appendChild(el("p","lead","4 ספרות. הקוד שומר על מסך ההורה — שם אפשר למחוק נתונים ולשנות הגדרות."));
+  const a=el("input","name-input pin"), b=el("input","name-input pin");
+  [a,b].forEach(i=>{ i.type="password"; i.inputMode="numeric"; i.maxLength=4; i.autocomplete="off"; });
+  b.placeholder="שוב"; box.append(a,b);
+  const r=el("div","btn-row"); const ok=el("button","btn go","שמירת הקוד"), no=el("button","btn ghost","ביטול");
+  ok.onclick=()=>{
+    if(!/^\d{4}$/.test(a.value)){ toast("הקוד צריך להיות 4 ספרות",true); return; }
+    if(a.value!==b.value){ toast("הקודים לא זהים — נסו שוב",true); b.value=""; return; }
+    lsSet(PIN_KEY,a.value); toast("קוד ההורה נשמר"); then();
+  };
+  no.onclick=closeModal; r.append(ok,no); box.appendChild(r);
+  modal(box); setTimeout(()=>a.focus(),50);
+}
+$("#changePin").onclick=()=>setPin(()=>{ closeModal(); });
+function syncTime(act,val){
+  const x=(DB.data.daily_schedule||[]).find(y=>y.activity===act);
+  if(x) x.time=val; DB.save(); toast("נשמר");
+}
+function confirmBox(text,fn){
+  const box=el("div"); box.appendChild(el("p","q",text));
+  const r=el("div","btn-row"); const y=el("button","btn","כן, למחוק"), n=el("button","btn ghost","ביטול");
+  y.onclick=()=>{ fn(); closeModal(); }; n.onclick=closeModal; r.append(y,n); box.appendChild(r); modal(box);
+}
+$("#resetProg").onclick=()=>confirmBox("לאפס את כל ההתקדמות והכוכבים? סדר היום והשם יישארו. אי אפשר לבטל.",()=>{
+  DB.data.child.progress={}; DB.save(); renderParent(); paintTop(); toast("ההתקדמות אופסה"); });
+$("#resetAll").onclick=()=>confirmBox(DEV ? "למחוק את העותק של מצב הבודק? הנתונים האמיתיים לא ייפגעו."
+                                         : "למחוק את כל הנתונים במכשיר הזה — שם, כיתה, התקדמות וסדר היום? אי אפשר לבטל.",()=>{
+  try{ localStorage.removeItem(KEY); }catch(e){} DB.data=DEF(); ob={step:0,name:"",gender:"",grade:0,avatar:"🦊",pq:0,pscore:0};
+  paintTop(); renderOb(); go("onboard"); toast("כל הנתונים נמחקו"); });
+$("#printBtn").onclick=()=>{
+  const list=[...(DB.data.daily_schedule||[])].sort((a,b)=>toMin(a.time)-toMin(b.time));
+  if(!list.length){ toast("עוד אין סדר יום — בונים אותו בשלב 'היום שלי'",true); return; }
+  const nm=DB.data.child.name;
+  $("#printSheet").innerHTML=`<h2>${nm?"היום של "+nm:"היום שלי"} · סיפור של יממה</h2>`+list.map(x=>{
+    const a=allActs().find(q=>q.id===x.activity)||{nm:x.activity,e:"•"}; const [h,m]=x.time.split(":").map(Number);
+    return `<div class="prow">${miniClock(h,m,70)}<span class="t">${x.time}</span><b>${a.nm}</b><span style="margin-inline-start:auto;font-size:26px">${a.e}</span></div>`;
+  }).join("");
+  window.print();
+};
+
+
+/* =====================================================================
+   Moti's method, from the hand sketches:
+   (1) the clock as a pie  (2) 24 = 12 + 12  (3) digital hours|minutes + roll-over
+   ===================================================================== */
+function mcq(box,opts,hint,onRight,skill){
+  const t0=Date.now(), sk=skill!==undefined?skill:(LV&&LV.skill);
+  const wrap=el("div","opts"); let miss=0, done=false;
+  opts.forEach(([t,ok],i)=>{
+    const b=el("button","opt",`<span class="tag">${["א","ב","ג","ד"][i]}</span>${t}`);
+    b.onclick=()=>{
+      if(done) return;
+      if(ok){ done=true; b.classList.add("good"); SFX.ok(); track(sk,miss===0,false,miss,(Date.now()-t0)/1000); onRight(miss===0); }
+      else { b.classList.add("bad"); SFX.oops(); miss++; say(hint); setTimeout(()=>b.classList.remove("bad"),700); }
+    };
+    wrap.appendChild(b);
+  });
+  box.appendChild(wrap);
+}
+const shuffle=a=>[...a].sort(()=>Math.random()-.5);
+
+/* ---------- (1) pie ---------- */
+function pieSVG(frac,label,size=104){
+  let fill;
+  if(frac>=1) fill=`<circle cx="50" cy="50" r="44" fill="#ffd166"/>`;
+  else{ const a=frac*360, [x,y]=polar(50,50,44,a);
+    fill=`<path d="M50 50 L50 6 A44 44 0 ${a>180?1:0} 1 ${x} ${y} Z" fill="#ffd166"/>`; }
+  const [hx,hy]=polar(50,50,40,frac>=1?0:frac*360);
+  const nums=[12,3,6,9].map(n=>{ const [x,y]=polar(50,50,33,n*30%360);
+    return `<text x="${x}" y="${y}" text-anchor="middle" dominant-baseline="central" font-size="11" font-weight="800" fill="#1d2246" font-family="Rubik,sans-serif">${n}</text>`; }).join("");
+  return `<div class="pie"><svg viewBox="0 0 100 100" width="${size}" height="${size}">
+    <circle cx="50" cy="50" r="44" fill="#fff" stroke="#1d2246" stroke-width="3"/>${fill}${nums}
+    <line x1="50" y1="50" x2="${hx}" y2="${hy}" stroke="#2f6fd0" stroke-width="3.5" stroke-linecap="round"/>
+    <circle cx="50" cy="50" r="3.5" fill="#1d2246"/></svg><div class="pl">${label}</div></div>`;
+}
+function pieIntro(mode,then){
+  const host=$("#levelBody"); host.innerHTML="";
+  const pies = mode==="half"
+    ? [[1,"שלם = 60 דקות"],[.5,"חצי = 30 דקות"]]
+    : [[.25,"רבע = 15 דקות"],[.5,"חצי = 30 דקות"],[.75,"שלושה רבעים = 45 דקות"],[1,"שלם = 60 דקות"]];
+  host.appendChild(el("p","q", mode==="half" ? "השעון הוא כמו עוגה. כל העוגה = שעה שלמה = 60 דקות."
+                                             : "חותכים את העוגה לארבעה חלקים שווים — כל חלק הוא רבע."));
+  host.appendChild(el("div","pies",pies.map(([f,l])=>pieSVG(f,l)).join("")));
+  const qb=el("div"); host.appendChild(qb);
+  const [q,opts,hint] = mode==="half"
+    ? ["חצי שעון — כמה דקות זה?", [["15",false],["30",true],["60",false]], "רמז: חצי מ־60."]
+    : ["שלושה רבעים — כמה דקות זה?", [["30",false],["45",true],["60",false]], "רמז: 15 + 15 + 15."];
+  qb.appendChild(el("p","qmeta","לפני שמתחילים"));
+  qb.appendChild(el("p","q",q));
+  mcq(qb,opts,hint,()=>setTimeout(then,700),"fractions");
+  say(mode==="half"?"שעה שלמה = כל העוגה. חצי עוגה = 30 דקות.":"רבע = 15, חצי = 30, שלושה רבעים = 45.");
+}
+
+/* ---------- (2) 24 = 12 + 12 ---------- */
+function twelveLine(H,tap=false){
+  const col = H==null?-1:(H===0?12:(H>12?H-12:H)), bottom=(H===0||H>12);
+  let top="",bot="";
+  for(let k=1;k<=12;k++){
+    top+=`<span data-h="${k}" class="${col===k?"col":""}${col===k&&!bottom?" on":""}">${k}</span>`;
+    bot+=`<span data-h="${k===12?0:k+12}" class="${col===k?"col":""}${col===k&&bottom?" on":""}">${k===12?"00":k+12}</span>`;
+  }
+  return `<div class="tline${tap?" tap":""}"><div class="tl-lab">☀️ 1–12</div><div class="tl-row">${top}</div>
+          <div class="tl-lab">🌙 13–00</div><div class="tl-row">${bot}</div></div>`;
+}
+function lvTwelve(){
+  const host=$("#levelBody"); host.innerHTML="";
+  host.appendChild(el("p","lead","ביממה יש 24 שעות = 12 + 12. אחרי 12 בצהריים ממשיכים לספור: 13, 14, 15… ו־13 זה בעצם 1 — אחת אחר הצהריים."));
+  const lineHost=el("div"); host.appendChild(lineHost);
+  const grid=el("div","task-grid"), left=el("div"), right=el("div","clock-wrap");
+  grid.append(left,right); host.appendChild(grid);
+  const KINDS=["toTwelve","toDigital","say","roll12","tapName","roll24"]; LV.n=KINDS.length;
+  const rH=()=>13+Math.floor(Math.random()*11);
+  const next=first=>{ if(first) LV.score++; LV.i++; setTimeout(draw,750); };
+  let tapH=null, tapMiss=0;
+  lineHost.addEventListener("click",e=>{
+    const sp=e.target.closest(".tline.tap span"); if(!sp||tapH==null) return;
+    const h=+sp.dataset.h;
+    if(h===tapH){ sp.classList.add("on"); SFX.ok(); track("twelve",tapMiss===0,false,tapMiss,0); say(`נכון! ${words(tapH,0)} = ${pad(tapH)}:00.`); tapH=null; next(tapMiss===0); }
+    else{ sp.classList.add("no"); SFX.oops(); tapMiss++;
+      say(`רמז: ${tapH-12} אחר הצהריים — בשורה התחתונה, מתחת ל־${tapH-12}.`); setTimeout(()=>sp.classList.remove("no"),600); }
+  });
+  const hero=e=>`<div class="hero"><div class="big">${e}</div></div>`;
+  function draw(){
+    if(LV.i>=KINDS.length){ grid.remove(); lineHost.remove();
+      return levelDone("עכשיו את יודעת: 13 זה 1, 14 זה 2… ואחרי 23:59 מגיע 00:00 — יום חדש."); }
+    setBar(LV.i/KINDS.length); left.innerHTML=""; right.innerHTML="";
+    const kind=KINDS[LV.i];
+    left.appendChild(el("p","qmeta",`משימה ${LV.i+1} מתוך ${KINDS.length}`));
+    let H;
+    if(kind==="toTwelve"){
+      H=rH(); lineHost.innerHTML=twelveLine(H); right.innerHTML=digiBox(H,0);
+      left.appendChild(el("p","q",`השעה ${H}:00. איזו שעה זו אם סופרים רק עד 12?`));
+      mcq(left,shuffle([[String(H-12),true],[String(H-10),false],[String(H),false]]),
+          `רמז: תסתכלי בשורה — מה עומד מעל ${H}? או: ${H} פחות 12.`,next);
+      say("תסתכלי בשורה: מה עומד מעל המספר הצהוב?");
+    }
+    else if(kind==="toDigital"){
+      H=rH(); lineHost.innerHTML=twelveLine(H); right.innerHTML=hero("🔢");
+      left.appendChild(el("p","q",`${words(H,0)} — איך כותבים את זה בשעון דיגיטלי?`));
+      mcq(left,shuffle([[`${pad(H)}:00`,true],[`${pad(H-12)}:00`,false],[`${pad(H-1)}:00`,false]]),
+          `רמז: אחרי הצהריים מוסיפים 12. ${H-12} ועוד 12 = ?`,next);
+      say("אחרי 12 בצהריים — מוסיפים 12.");
+    }
+    else if(kind==="say"){
+      H=14+Math.floor(Math.random()*8); lineHost.innerHTML=twelveLine(H); right.innerHTML=digiBox(H,0);
+      left.appendChild(el("p","q",`${pad(H)}:00 — איך אומרים את השעה הזאת?`));
+      const alt=H+1<=23?H+1:H-2;
+      mcq(left,shuffle([[words(H,0),true],[words(H-12,0),false],[words(alt,0),false]]),
+          "רמז: מחסירים 12 כדי לדעת איזו שעה — ואחרי 12 זה אחר הצהריים, ערב או לילה.",next);
+    }
+    else if(kind==="tapName"){
+      H=rH(); tapH=H; tapMiss=0; lineHost.innerHTML=twelveLine(null,true); right.innerHTML=hero("👆");
+      left.appendChild(el("p","q",`לחצי בשורות על השעה: "${words(H,0)}".`));
+      say(`איפה ${words(H,0)}? לחצי על המספר.`);
+    }
+    else{
+      const [a,b] = kind==="roll12" ? [[12,59],[13,0]] : [[23,59],[0,0]];
+      lineHost.innerHTML=twelveLine(b[0]); right.innerHTML=digiBox(a[0],a[1]);
+      left.appendChild(el("p","q",`השעה ${pad(a[0])}:${pad(a[1])}. מה השעה דקה אחרי?`));
+      const opts = kind==="roll12" ? [["12:60",false],["13:00",true],["00:00",false]]
+                                   : [["23:60",false],["00:00",true],["12:00",false]];
+      mcq(left,shuffle(opts), kind==="roll12"
+          ? "רמז: אין 60 דקות — אחרי 59 מתחילה שעה חדשה, והדקות חוזרות ל־00."
+          : "רמז: אחרי 23:59 היממה נגמרת — ומתחיל יום חדש.",
+        first=>{ right.innerHTML=digiBox(b[0],b[1]); right.querySelector(".digi").classList.add("tick");
+          say(kind==="roll12"?"12:59 ועוד דקה = 13:00.":"23:59 ועוד דקה = 00:00 — חצות, יום חדש!"); next(first); });
+    }
+  }
+  draw();
+}
+
+/* ---------- (3) digital: hours | minutes, minute by minute, roll-over ---------- */
+function digiBox(h,m){
+  return `<div class="digi"><span class="lab">שעות</span><span></span><span class="lab">דקות</span>
+          <b class="dh">${pad(h)}</b><i>:</i><b class="dm">${pad(m)}</b></div>`;
+}
+function lvDigital(){
+  const host=$("#levelBody"); host.innerHTML="";
+  host.appendChild(el("p","lead","בשעון דיגיטלי יש שני חלקים: משמאל השעות, מימין הדקות. כל דקה — המספר הימני עולה ב־1. ואחרי 59 מתחילה שעה חדשה."));
+  const grid=el("div","task-grid"), left=el("div"), right=el("div","clock-wrap");
+  grid.append(left,right); host.appendChild(grid);
+  const KINDS=["parts","plus1","plus10","roll","roll","roll24","play"]; LV.n=KINDS.length-1;
+  const next=first=>{ if(first) LV.score++; LV.i++; setTimeout(draw,800); };
+  const R=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+  let rollHours=shuffle([7,8,9,10]).slice(0,2);
+  function draw(){
+    if(LV.i>=KINDS.length){ grid.remove();
+      return levelDone("את קוראת שעון דיגיטלי: שעות משמאל, דקות מימין, ואחרי 59 — שעה חדשה."); }
+    setBar(LV.i/KINDS.length); left.innerHTML=""; right.innerHTML="";
+    const kind=KINDS[LV.i];
+    if(kind!=="play") left.appendChild(el("p","qmeta",`משימה ${LV.i+1} מתוך ${KINDS.length-1}`));
+    const show=(h,m)=>{ right.innerHTML=digiBox(h,m); };
+    const after=(h,m)=>{ show(h,m); right.querySelector(".digi").classList.add("tick"); };
+
+    if(kind==="parts"){
+      show(9,13);
+      left.appendChild(el("p","q","לחצי על החלק שמראה את השעות."));
+      let miss=0;
+      right.querySelector(".dh").onclick=()=>{ right.querySelector(".dh").classList.add("ok"); SFX.ok(); track("digital",miss===0,false,miss,0);
+        say("נכון! 09 זה השעה — תשע. 13 זה הדקות."); next(miss===0); };
+      right.querySelector(".dm").onclick=()=>{ const d=right.querySelector(".dm"); d.classList.add("no"); SFX.oops(); miss++;
+        say("זה החלק של הדקות. השעות נמצאות בצד השני של הנקודתיים."); setTimeout(()=>d.classList.remove("no"),700); };
+      say("לחצי על השעות.");
+    }
+    else if(kind==="plus1"){
+      const h=R(7,10), m=R(1,48); show(h,m);
+      left.appendChild(el("p","q",`השעה ${pad(h)}:${pad(m)}. מה השעה דקה אחרי?`));
+      mcq(left,shuffle([[`${pad(h)}:${pad(m+1)}`,true],[`${pad(h+1)}:${pad(m)}`,false],[`${pad(h)}:${pad(m-1)}`,false]]),
+          "רמז: רק הדקות משתנות — הן עולות ב־1. השעות נשארות.",f=>{ after(h,m+1); next(f); });
+    }
+    else if(kind==="plus10"){
+      const h=8, m=[0,10,20,30,40][R(0,4)]; show(h,m);
+      left.appendChild(el("p","q",`השעה ${pad(h)}:${pad(m)}. מה השעה עשר דקות אחרי?`));
+      mcq(left,shuffle([[`${pad(h)}:${pad(m+10)}`,true],[`${pad(h)}:${pad(m+1)}`,false],[`${pad(h+1)}:${pad(m)}`,false]]),
+          "רמז: עשר דקות — הספרה הראשונה של הדקות עולה ב־1.",f=>{ after(h,m+10); next(f); });
+    }
+    else if(kind==="roll"){
+      const h=rollHours.shift(); show(h,59);
+      left.appendChild(el("p","q",`השעה ${pad(h)}:59. מה השעה דקה אחרי?`));
+      mcq(left,shuffle([[`${pad(h)}:60`,false],[`${pad(h+1)}:00`,true],[`${pad(h)}:00`,false]]),
+          "רמז: אין 60 דקות. אחרי 59 — השעה עולה ב־1, והדקות חוזרות ל־00.",
+          f=>{ after(h+1,0); say(`${pad(h)}:59 ועוד דקה = ${pad(h+1)}:00. שעה חדשה!`); next(f); });
+    }
+    else if(kind==="roll24"){
+      show(23,59);
+      left.appendChild(el("p","q","השעה 23:59. מה השעה דקה אחרי?"));
+      mcq(left,shuffle([["23:60",false],["24:60",false],["00:00",true]]),
+          "רמז: אחרי 23:59 היממה נגמרת — ומתחיל יום חדש.",
+          f=>{ after(0,0); say("00:00 — חצות. יום חדש מתחיל!"); next(f); });
+    }
+    else{ /* free play before finishing */
+      let h=7, m=57; show(h,m);
+      left.appendChild(el("p","q","מגרש משחקים: לחצי '+1 דקה' ותראי מה קורה אחרי 59."));
+      const r=el("div","btn-row");
+      const b1=el("button","btn sun","+1 דקה"), b10=el("button","btn ghost","+10 דקות"), fin=el("button","btn go","סיימתי ✓");
+      const step=n=>{ m+=n; while(m>=60){ m-=60; h=(h+1)%24; if(h===0) say("חצות! 00:00 — יום חדש."); }
+        after(h,m); SFX.tick(); if(m<n) say(`עברנו שעה! עכשיו ${pad(h)}:${pad(m)}.`); };
+      b1.onclick=()=>step(1); b10.onclick=()=>step(10); fin.onclick=()=>{ LV.i++; draw(); };
+      r.append(b1,b10,fin); left.appendChild(r);
+      say("נסי בעצמך — מה קורה אחרי 7:59?");
+    }
+  }
+  draw();
+}
+
+
+/* ---------- level: the day as a line (first station — no analog clock) ---------- */
+function dayLineHTML(){
+  let cells="";
+  for(let h=0;h<24;h++){
+    const night=(h>=20||h<6), ic=h===0?"🌙":h===6?"🌅":h===12?"☀️":h===18?"🌇":"";
+    cells+=`<button class="lc ${night?"n":"d"}" data-h="${h}"><small>${ic}</small><b>${pad(h)}</b></button>`;
+  }
+  return `<div class="dline-wrap"><div class="dline">${cells}</div>
+    <div class="dline-cap"><span>00:00 · כאן היום מתחיל</span><span>כאן היום נגמר · 23:59</span></div></div>`;
+}
+function lvLine(){
+  const host=$("#levelBody"); host.innerHTML="";
+  host.appendChild(el("p","lead","היממה היא קו של 24 שעות. היא מתחילה ב־00:00 — חצות — ונגמרת ב־23:59. ואז מתחיל יום חדש, שוב מ־00."));
+  const lineHost=el("div",null,dayLineHTML()); host.appendChild(lineHost);
+  const box=el("div"); host.appendChild(box);
+  const T=[
+    {k:"tap",h:0, q:"היום מתחיל בחצות — 00:00. לחצי על השעה שבה מתחיל היום.", hint:"רמז: המשבצת הראשונה — בצד ימין, עם הירח."},
+    {k:"tap",h:7, q:"בבוקר קמים בשעה 7. לחצי על 07.", hint:"רמז: סופרים מ־00: אחת, שתיים, שלוש… עד שבע."},
+    {k:"tap",h:8, q:"מה בא אחרי 7? לחצי עליו.", hint:"רמז: המשבצת שליד 07 — הבאה בתור."},
+    {k:"mc",  q:"מה בא אחרי 23?", o:[["24",false],["00 — יום חדש",true],["22",false]],
+     hint:"רמז: אחרי 23 היום נגמר, ומתחיל יום חדש — שוב מ־00."},
+    {k:"tap",h:19,q:"ארוחת ערב בשעה 19. לחצי על 19.", hint:"רמז: 19 בא אחרי 18 — בצד שמאל, כשכבר מחשיך."},
+    {k:"mc",  q:"כמה שעות יש ביממה?", o:[["12",false],["24",true],["60",false]],
+     hint:"רמז: ספרי את המשבצות — מ־00 ועד 23."}
+  ];
+  LV.n=T.length;
+  let cur=null, miss=0;
+  const next=first=>{ if(first) LV.score++; LV.i++; setTimeout(draw,800); };
+  lineHost.addEventListener("click",e=>{
+    const b=e.target.closest(".lc"); if(!b||!cur||cur.k!=="tap") return;
+    const h=+b.dataset.h;
+    if(h===cur.h){ b.classList.add("on"); SFX.ok(); track("day_line",miss===0,false,miss,0); const t=cur; cur=null;
+      say(t.h===0?"נכון! 00:00 — חצות. מכאן היום מתחיל.":t.h===7?"נכון! 07:00 — בוקר טוב.":`נכון! ${pad(t.h)}.`); next(miss===0); }
+    else{ b.classList.add("no"); SFX.oops(); miss++; say(cur.hint); setTimeout(()=>b.classList.remove("no"),600); }
+  });
+  function draw(){
+    $$(".lc.on",lineHost).forEach(x=>x.classList.remove("on"));
+    if(LV.i>=T.length){ box.remove();
+      return levelDone("זה הקו של היממה: 24 שעות, מ־00:00 ועד 23:59 — ואז מתחיל יום חדש, כמו שאחרי יום ראשון בא יום שני."); }
+    setBar(LV.i/T.length); box.innerHTML=""; miss=0; cur=T[LV.i];
+    box.appendChild(el("p","qmeta",`משימה ${LV.i+1} מתוך ${T.length}`));
+    box.appendChild(el("p","q",cur.q));
+    if(cur.k==="mc") mcq(box,shuffle(cur.o),cur.hint,next);
+    say(cur.q);
+  }
+  draw();
+}
+
+/* ---------- level: the clock as a pie (bridge to the analog clock) ---------- */
+function lvPie(){
+  const host=$("#levelBody"); host.innerHTML="";
+  host.appendChild(el("p","lead","השעון הוא כמו עוגה עגולה. כל העוגה = שעה שלמה = 60 דקות. חותכים לחצי — 30 דקות. חותכים לארבעה — כל חתיכה 15 דקות."));
+  host.appendChild(el("div","pies",[[.25,"רבע = 15"],[.5,"חצי = 30"],[.75,"שלושה רבעים = 45"],[1,"שלם = 60"]].map(([f,l])=>pieSVG(f,l)).join("")));
+  const grid=el("div","task-grid"), left=el("div"), right=el("div","clock-wrap");
+  grid.append(left,right); host.appendChild(grid);
+  const T=[
+    {f:.5,  q:"כמה דקות יש בחצי עוגה?",           o:[["15",false],["30",true],["60",false]], h:"רמז: חצי מ־60."},
+    {f:.25, q:"וכמה דקות יש ברבע עוגה?",          o:[["15",true],["30",false],["45",false]], h:"רמז: חצי מתוך חצי — 30 חלקי 2."},
+    {f:.75, q:"שלושה רבעים — כמה דקות?",          o:[["30",false],["45",true],["60",false]], h:"רמז: 15 + 15 + 15."},
+    {f:null,q:"איזו עוגה מראה 30 דקות?",          o:[[pieSVG(.25,"",90),false],[pieSVG(.5,"",90),true],[pieSVG(.75,"",90),false]], h:"רמז: 30 זה חצי."},
+    {f:1,   q:"כל העוגה — שעה שלמה — כמה דקות?",  o:[["12",false],["24",false],["60",true]], h:"רמז: בשעה יש 60 דקות."}
+  ];
+  LV.n=T.length;
+  const next=first=>{ if(first) LV.score++; LV.i++; setTimeout(draw,750); };
+  function draw(){
+    if(LV.i>=T.length){ grid.remove();
+      return levelDone("העוגה מוכרת לך: חצי = 30, רבע = 15, שלושה רבעים = 45. עכשיו נוסיף לה מחוגים!"); }
+    setBar(LV.i/T.length); left.innerHTML="";
+    const t=T[LV.i];
+    right.innerHTML = t.f!=null ? pieSVG(t.f,"",210) : `<div class="hero"><div class="big">🥧</div></div>`;
+    left.appendChild(el("p","qmeta",`משימה ${LV.i+1} מתוך ${T.length}`));
+    left.appendChild(el("p","q",t.q));
+    mcq(left,shuffle(t.o),t.h,next);
+    say(t.q);
+  }
+  draw();
+}
+
+/* ---------- digital time picker (used when building the day) ---------- */
+function digiPicker(host,h,m){
+  const st={h,m};
+  const w=el("div","dpick",`<div class="col"><span class="lab">שעות</span><button data-d="h1">▲</button><b class="dh"></b><button data-d="h-1">▼</button></div>
+    <i>:</i><div class="col"><span class="lab">דקות</span><button data-d="m5">▲</button><b class="dm"></b><button data-d="m-5">▼</button></div>`);
+  const wd=el("div","pickwords");
+  const paint=()=>{ w.querySelector(".dh").textContent=pad(st.h); w.querySelector(".dm").textContent=pad(st.m); wd.textContent=words(st.h,st.m); };
+  w.addEventListener("click",e=>{ const b=e.target.closest("button"); if(!b) return;
+    const d=b.dataset.d, n=+d.slice(1);
+    if(d[0]==="h") st.h=(st.h+n+24)%24; else st.m=(st.m+n+60)%60;
+    SFX.tick(); paint(); });
+  paint(); host.appendChild(w); host.appendChild(wd);
+  return st;
+}
+
+
+/* =====================================================================
+   WEEK · TASKS · WEEKLY PLANNING  (brief §10 screens 5–6, Moti's week sketch)
+   ===================================================================== */
+const DAYS=["א׳","ב׳","ג׳","ד׳","ה׳","ו׳","ש׳"], DAYN=["ראשון","שני","שלישי","רביעי","חמישי","שישי","שבת"];
+const ymd=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+const noonOf=d=>{ const x=new Date(d); x.setHours(12,0,0,0); return x; };
+const todayD=()=>{ const d=noonOf(new Date()); const off=(DEV&&DB.data.settings.devOffset)||0; if(off) d.setDate(d.getDate()+off); return d; };
+const addD=(d,n)=>{ const x=new Date(d); x.setDate(x.getDate()+n); return x; };
+const parseD=s=>{ const [y,m,dd]=s.split("-").map(Number); return new Date(y,m-1,dd,12); };
+const diffD=(a,b)=>Math.round((noonOf(b)-noonOf(a))/864e5);
+const dayLabel=s=>{ const d=parseD(s); return `יום ${DAYS[d.getDay()]} · ${d.getDate()}/${d.getMonth()+1}`; };
+const uid=()=>Math.random().toString(36).slice(2,9);
+const gate=()=>DB.data.settings.weeklyGate||{on:false,day:6};
+function weekId(){ let d=todayD(); const g=gate().day; while(d.getDay()!==g) d=addD(d,-1); return ymd(d); }
+function weekStart(){ let d=parseD(weekId()); while(d.getDay()!==0) d=addD(d,1); return d; }
+function gateActive(){ return !!(gate().on && DB.data.settings.onboarded && !(DB.data.weekPlans||{})[weekId()]); }
+const overlap=(a,b)=>{ const as=toMin(a.time),bs=toMin(b.time); return as<bs+b.dur && bs<as+a.dur; };
+
+const TT={
+  test:   {e:"📝",nm:"מבחן",       steps:["לקרוא ולסמן את החומר","לתרגל שאלות","חזרה אחרונה — ולישון טוב"]},
+  project:{e:"📚",nm:"עבודה",      steps:["לאסוף חומר ורעיונות","לכתוב טיוטה","לסדר, לבדוק ולהגיש"]},
+  hw:     {e:"✏️",nm:"שיעורי בית", steps:["להכין את שיעורי הבית"]},
+  other:  {e:"📌",nm:"אחר",        steps:["להתחיל","לסיים"]}
+};
+const WEEK_LIB=[
+  {nm:"חוג",e:"⚽",dur:60},{nm:"צהרון",e:"🧸",dur:180},{nm:"מורה פרטית",e:"👩‍🏫",dur:60},
+  {nm:"תנועת נוער",e:"🏕️",dur:120},{nm:"נגינה",e:"🎹",dur:45},{nm:"אימון",e:"🏊",dur:60},
+  {nm:"זמן משפחה",e:"👨‍👩‍👧",dur:120},{nm:"אחר",e:"📌",dur:60}
+];
+const EMOJIS=["⚽","🏀","🎹","🎨","📖","🏊","🤸","🥋","🎭","🕍","🐶","🧩","👨‍👩‍👧","🎻","💃","🧑‍🍳"];
+
+/* what happens on a given date */
+function itemsOn(date){
+  const s=ymd(date), dow=date.getDay(), out=[];
+  (DB.data.week||[]).filter(w=>w.day===dow).forEach(w=>out.push({kind:"rec",ref:w,time:w.time,dur:w.dur,nm:w.nm,e:w.e}));
+  (DB.data.events||[]).filter(v=>v.date===s).forEach(v=>out.push({kind:"one",ref:v,time:v.time,dur:v.dur,nm:v.nm,e:v.e}));
+  (DB.data.tasks||[]).forEach(t=>{
+    if(t.due_date===s) out.push({kind:"due",ref:t,time:"",dur:0,nm:`${TT[t.type].nm}: ${t.title}`,e:TT[t.type].e});
+    (t.steps||[]).forEach(st=>{ if(st.date===s) out.push({kind:"step",ref:st,task:t,time:"",dur:st.min||30,nm:`${st.title} (${t.title})`,e:st.done?"✅":"▫️"}); });
+  });
+  return out.sort((a,b)=>(a.time||"99").localeCompare(b.time||"99"));
+}
+const loadOf=items=>items.reduce((s,i)=>s+(i.kind==="due"?(i.ref.type==="test"?60:30):(i.dur||0)),0);
+function loadBadge(min){
+  if(min<90)  return {c:"#43c47f",w:Math.max(8,min/2.4),t:"עומס קל"};
+  if(min<180) return {c:"#ffc43d",w:min/2.4,t:"עומס בינוני"};
+  return {c:"#e8833c",w:100,t:"עומס כבד"};
+}
+
+/* ---------- the week grid (used by the week screen and by weekly planning) ---------- */
+function renderWeekGrid(host,editable,rerender){
+  const ws=weekStart(), tday=ymd(todayD());
+  const grid=el("div","weekgrid");
+  for(let i=0;i<7;i++){
+    const d=addD(ws,i), s=ymd(d), items=itemsOn(d), load=loadOf(items), lb=loadBadge(load);
+    const c=el("div","dayc"+(s===tday?" today":""));
+    c.appendChild(el("h4",null,`יום ${DAYS[i]}<small>${d.getDate()}/${d.getMonth()+1}</small>`));
+    items.forEach(it=>{
+      const row=el("div","witem "+it.kind,`<span>${it.e}</span><span>${it.nm}</span>${it.time?`<span class="t">${it.time}</span>`:""}`);
+      if(editable && (it.kind==="rec"||it.kind==="one")){
+        const x=el("button","x","×"); x.title="הסרה";
+        x.onclick=()=>{ if(it.kind==="rec") DB.data.week=DB.data.week.filter(w=>w!==it.ref); else DB.data.events=DB.data.events.filter(v=>v!==it.ref);
+          DB.save(); SFX.tick(); rerender&&rerender(); };
+        row.appendChild(x);
+      }
+      c.appendChild(row);
+    });
+    if(!items.length) c.appendChild(el("div","loadlbl","— פנוי —"));
+    c.appendChild(el("div","loadlbl",lb.t));
+    const bar=el("div","load"); bar.innerHTML=`<i style="width:${lb.w}%;background:${lb.c}"></i>`; c.appendChild(bar);
+    grid.appendChild(c);
+  }
+  host.appendChild(grid);
+  if(editable){
+    const r=el("div","btn-row");
+    const add=el("button","btn sun","➕ להוסיף לשבוע"); add.onclick=()=>addWeekModal(()=>rerender&&rerender());
+    r.appendChild(add); host.appendChild(r);
+  }
+}
+function weekWarnings(){
+  const ws=weekStart(), out=[];
+  for(let i=0;i<7;i++){
+    const d=addD(ws,i), items=itemsOn(d), load=loadOf(items);
+    if(load>=180) out.push(`יום ${DAYS[i]} עמוס מאוד — אולי להזיז משהו ליום פנוי יותר?`);
+    const timed=items.filter(x=>x.time);
+    for(let a=0;a<timed.length;a++) for(let b=a+1;b<timed.length;b++)
+      if(overlap(timed[a],timed[b])) out.push(`ביום ${DAYS[i]} "${timed[a].nm}" ו"${timed[b].nm}" באותה שעה.`);
+    const test=items.find(x=>x.kind==="due"&&x.ref.type==="test");
+    if(test && i>0 && loadOf(itemsOn(addD(ws,i-1)))>=150) out.push(`יום לפני ה${test.nm} (יום ${DAYS[i-1]}) עמוס — כדאי להתחיל לחזור מוקדם יותר.`);
+  }
+  return [...new Set(out)];
+}
+
+/* ---------- add to the week ---------- */
+function addWeekModal(then){
+  const st={nm:"חוג",e:"⚽",dur:60,days:new Set(),rec:true};
+  const box=el("div"); box.appendChild(el("p","q","➕ מה להוסיף לשבוע?"));
+  const lib=el("div","chips");
+  const lib2=[...WEEK_LIB.slice(0,-1),...(DB.data.custom_acts||[]).map(a=>({nm:a.nm,e:a.e,dur:a.dur})),WEEK_LIB[WEEK_LIB.length-1]];
+  lib2.forEach(x=>{ const b=el("button","chip2"+(x.nm===st.nm?" on":""),`${x.e} ${x.nm}`);
+    b.onclick=()=>{ st.nm=x.nm==="אחר"?"":x.nm; st.e=x.e; st.dur=x.dur; nmI.value=st.nm; durS.value=String(st.dur);
+      $$(".chip2",lib).forEach(y=>y.classList.remove("on")); b.classList.add("on"); if(x.nm==="אחר") nmI.focus(); };
+    lib.appendChild(b); });
+  box.appendChild(lib);
+  const f1=el("div","formrow",'<label>שם (למשל "חוג כדורגל")</label>'); const nmI=el("input"); nmI.type="text"; nmI.value=st.nm; f1.appendChild(nmI); box.appendChild(f1);
+  const f2=el("div","formrow","<label>באילו ימים?</label>"); const dch=el("div","chips");
+  DAYS.forEach((d,i)=>{ const b=el("button","chip2",d); b.onclick=()=>{ st.days.has(i)?st.days.delete(i):st.days.add(i); b.classList.toggle("on"); }; dch.appendChild(b); });
+  f2.appendChild(dch); box.appendChild(f2);
+  const f3=el("div","formrow","<label>באיזו שעה מתחיל?</label>"); box.appendChild(f3); const tp=digiPicker(f3,16,0);
+  const f4=el("div","formrow","<label>כמה זמן?</label>"); const durS=el("select");
+  [[30,"חצי שעה"],[45,"45 דקות"],[60,"שעה"],[90,"שעה וחצי"],[120,"שעתיים"],[180,"שלוש שעות"]].forEach(([v,t])=>{ const o=el("option",null,t); o.value=v; if(v===st.dur) o.selected=true; durS.appendChild(o); });
+  f4.appendChild(durS); box.appendChild(f4);
+  const f5=el("div","formrow","<label>קבוע או חד־פעמי?</label>"); const rch=el("div","chips");
+  const rA=el("button","chip2 on","🔁 כל שבוע"), rB=el("button","chip2","1️⃣ רק השבוע");
+  rA.onclick=()=>{ st.rec=true; rA.classList.add("on"); rB.classList.remove("on"); };
+  rB.onclick=()=>{ st.rec=false; rB.classList.add("on"); rA.classList.remove("on"); };
+  rch.append(rA,rB); f5.appendChild(rch); box.appendChild(f5);
+  const r=el("div","btn-row"); const ok=el("button","btn go","שמירה ✓"), no=el("button","btn ghost","ביטול");
+  ok.onclick=()=>{
+    const nm=nmI.value.trim(); if(!nm){ toast("כתבו שם לפעילות",true); return; }
+    if(!st.days.size){ toast("בחרו לפחות יום אחד",true); return; }
+    const time=pad(tp.h)+":"+pad(tp.m), dur=+durS.value, ws=weekStart();
+    st.days.forEach(i=>{
+      if(st.rec) DB.data.week.push({id:uid(),day:i,time,dur,nm,e:st.e});
+      else DB.data.events.push({id:uid(),date:ymd(addD(ws,i)),time,dur,nm,e:st.e});
+    });
+    DB.save(); closeModal(); SFX.ok();
+    const clash=[...st.days].filter(i=>{ const it=itemsOn(addD(ws,i)).filter(x=>x.time); return it.some((a,j)=>it.some((b,k)=>k>j&&overlap(a,b))); });
+    if(clash.length) toast(`שימו לב: ביום ${clash.map(i=>DAYS[i]).join(", ")} יש שני דברים באותה שעה`,true);
+    else toast(`${nm} נוסף לשבוע`);
+    then&&then();
+  };
+  no.onclick=closeModal; r.append(ok,no); box.appendChild(r);
+  modal(box);
+}
+
+/* ---------- custom activity (for the day builder and the week) ---------- */
+function customActModal(then){
+  const st={e:"⚽"};
+  const box=el("div"); box.appendChild(el("p","q","➕ פעילות משלי"));
+  const f1=el("div","formrow","<label>מה זה?</label>"); const nmI=el("input"); nmI.type="text"; nmI.placeholder="למשל: חוג ציור, תפילה, אימון שחייה"; f1.appendChild(nmI); box.appendChild(f1);
+  const f2=el("div","formrow","<label>סמל</label>"); const em=el("div","emojis");
+  EMOJIS.forEach(x=>{ const b=el("button",x===st.e?"on":"",x); b.onclick=()=>{ st.e=x; $$("button",em).forEach(y=>y.classList.remove("on")); b.classList.add("on"); }; em.appendChild(b); });
+  f2.appendChild(em); box.appendChild(f2);
+  const f3=el("div","formrow","<label>כמה זמן?</label>"); const durS=el("select");
+  [[20,"20 דקות"],[30,"חצי שעה"],[45,"45 דקות"],[60,"שעה"],[90,"שעה וחצי"],[120,"שעתיים"],[180,"שלוש שעות"]].forEach(([v,t])=>{ const o=el("option",null,t); o.value=v; if(v===60) o.selected=true; durS.appendChild(o); });
+  f3.appendChild(durS); box.appendChild(f3);
+  const r=el("div","btn-row"); const ok=el("button","btn go","המשך ▸"), no=el("button","btn ghost","ביטול");
+  ok.onclick=()=>{ const nm=nmI.value.trim(); if(!nm){ toast("כתבו מה הפעילות",true); return; }
+    const pal=["#2fa7b9","#d9609a","#7a5ad6","#e5843a","#3fae7a","#4f7fe0"];
+    const a={id:"c_"+uid(),nm,e:st.e,dur:+durS.value,c:pal[(DB.data.custom_acts||[]).length%pal.length],def:"16:00"};
+    (DB.data.custom_acts=DB.data.custom_acts||[]).push(a); DB.save(); then&&then(a); };
+  no.onclick=closeModal; r.append(ok,no); box.appendChild(r);
+  modal(box); setTimeout(()=>nmI.focus(),50);
+}
+
+/* ---------- tasks: add, auto-split into steps, tick off ---------- */
+function autoSteps(t){
+  const due=parseD(t.due_date), names=TT[t.type].steps, n=names.length, today=todayD();
+  const per=Math.max(15,Math.round((t.est||60)/n/5)*5);
+  t.steps=names.map((title,i)=>{ let d=addD(due,-(n-i)); if(d<today) d=today; return {id:uid(),title,date:ymd(d),min:per,done:false}; });
+}
+function addTaskModal(then){
+  const st={type:"test"};
+  const box=el("div"); box.appendChild(el("p","q","➕ מטלה חדשה"));
+  const tch=el("div","chips");
+  Object.entries(TT).forEach(([k,v])=>{ const b=el("button","chip2"+(k===st.type?" on":""),`${v.e} ${v.nm}`);
+    b.onclick=()=>{ st.type=k; $$(".chip2",tch).forEach(y=>y.classList.remove("on")); b.classList.add("on"); }; tch.appendChild(b); });
+  box.appendChild(tch);
+  const f1=el("div","formrow","<label>במה? (למשל: מדעים, חשבון, עבודה על בעלי חיים)</label>"); const ti=el("input"); ti.type="text"; f1.appendChild(ti); box.appendChild(f1);
+  const f2=el("div","formrow","<label>עד מתי?</label>"); const di=el("input"); di.type="date"; di.min=ymd(todayD()); di.value=ymd(addD(todayD(),4)); f2.appendChild(di); box.appendChild(f2);
+  const f3=el("div","formrow","<label>כמה זמן זה ייקח בערך, בסך הכול?</label>"); const es=el("select");
+  [[30,"חצי שעה"],[60,"שעה"],[90,"שעה וחצי"],[120,"שעתיים"],[180,"שלוש שעות"],[300,"יותר"]].forEach(([v,t])=>{ const o=el("option",null,t); o.value=v; if(v===90) o.selected=true; es.appendChild(o); });
+  f3.appendChild(es); box.appendChild(f3);
+  const r=el("div","btn-row"); const ok=el("button","btn go","שמירה וחלוקה לשלבים ✓"), no=el("button","btn ghost","ביטול");
+  ok.onclick=()=>{
+    const title=ti.value.trim(); if(!title){ toast("כתבו במה המטלה",true); return; }
+    if(!di.value || di.value<ymd(todayD())){ toast("בחרו תאריך מהיום והלאה",true); return; }
+    const t={id:uid(),title,type:st.type,due_date:di.value,est:+es.value,steps:[],done:false,created:ymd(todayD())};
+    autoSteps(t); (DB.data.tasks=DB.data.tasks||[]).push(t); DB.save(); closeModal(); SFX.ok();
+    toast(t.steps.length>1?`חילקנו ל־${t.steps.length} שלבים — אפשר לשנות`:"נוסף");
+    then&&then();
+  };
+  no.onclick=closeModal; r.append(ok,no); box.appendChild(r);
+  modal(box); setTimeout(()=>ti.focus(),50);
+}
+function taskCard(t,rerender){
+  const left=diffD(todayD(),parseD(t.due_date));
+  const undone=(t.steps||[]).filter(s=>!s.done).length, total=(t.steps||[]).length;
+  const allDone=total>0&&!undone;
+  const c=el("div","taskc"+(allDone?" done":""));
+  const h=el("h3",null,`<span>${TT[t.type].e}</span><span>${TT[t.type].nm}: ${t.title}</span>`);
+  const del=el("button","del","🗑️"); del.title="מחיקה";
+  del.onclick=()=>confirmBox(`למחוק את "${t.title}"?`,()=>{ DB.data.tasks=DB.data.tasks.filter(x=>x!==t); DB.save(); rerender(); });
+  h.appendChild(del); c.appendChild(h);
+  c.appendChild(el("div","due",`עד ${dayLabel(t.due_date)} · ${allDone?"🎉 הושלם!":left>1?`עוד ${left} ימים`:left===1?"מחר!":left===0?"היום!":"התאריך עבר"} · ${total-undone}/${total} שלבים`));
+  (t.steps||[]).forEach(s=>{
+    const row=el("div","stp"+(s.done?" done":""));
+    const cb=el("input"); cb.type="checkbox"; cb.checked=s.done;
+    cb.onchange=()=>{ s.done=cb.checked; DB.save(); SFX[cb.checked?"ok":"tick"]();
+      if((t.steps||[]).every(x=>x.done)){ t.done=true; DB.save(); SFX.win(); confetti(); toast(`${t.title} — הושלם! 🎉`); } else t.done=false;
+      rerender(); };
+    const ti=el("input","st"); ti.type="text"; ti.value=s.title; ti.onchange=()=>{ s.title=ti.value; DB.save(); };
+    const di=el("input"); di.type="date"; di.value=s.date; di.onchange=()=>{ s.date=di.value; DB.save(); rerender(); };
+    row.append(cb,ti,di); c.appendChild(row);
+  });
+  if(!allDone){
+    if(left<=1 && undone>1) c.appendChild(el("div","warn","⚠️ נשאר מעט זמן ועוד כמה שלבים — כדאי להתחיל כבר היום, או לבקש עזרה."));
+    if((t.steps||[]).some(s=>s.date>t.due_date)) c.appendChild(el("div","warn","⚠️ יש שלב שמתוכנן אחרי תאריך ההגשה."));
+    if((t.steps||[]).some(s=>!s.done && s.date<ymd(todayD()))) c.appendChild(el("div","warn","⏰ יש שלב שהתאריך שלו כבר עבר — אפשר להזיז אותו להיום."));
+  }
+  return c;
+}
+function renderTaskList(host,filter,rerender){
+  const list=(DB.data.tasks||[]).filter(filter||(()=>true)).sort((a,b)=>a.due_date.localeCompare(b.due_date));
+  if(!list.length) host.appendChild(el("p","lead","אין מטלות כרגע. יש מבחן או עבודה בקרוב? מוסיפים כאן — ומקבלים חלוקה לשלבים."));
+  list.forEach(t=>host.appendChild(taskCard(t,rerender)));
+  const r=el("div","btn-row"); const add=el("button","btn sun","➕ מבחן, עבודה או שיעורי בית"); add.onclick=()=>addTaskModal(rerender);
+  r.appendChild(add); host.appendChild(r);
+}
+
+/* ---------- screens ---------- */
+function renderWeekScreen(){
+  const h=$("#weekBody"); h.innerHTML="";
+  const ws=weekStart();
+  h.appendChild(el("p","lead",`${dayLabel(ymd(ws))} עד ${dayLabel(ymd(addD(ws,6)))}. דברים קבועים (🔁) חוזרים כל שבוע; מבחנים ושלבי מטלות מופיעים לבד מהמסך "מטלות".`));
+  renderWeekGrid(h,true,renderWeekScreen);
+  weekWarnings().forEach(w=>h.appendChild(el("div","warn","⚠️ "+w)));
+}
+function renderTasksScreen(){ const h=$("#tasksBody"); h.innerHTML=""; renderTaskList(h,null,renderTasksScreen); }
+$("#weekBtn").onclick=()=>{ renderWeekScreen(); go("week"); };
+$("#tasksBtn").onclick=()=>{ renderTasksScreen(); go("tasks"); };
+
+/* ---------- the weekly planning gate ---------- */
+let planStep=0;
+function renderPlan(){
+  const h=$("#planBody"); h.innerHTML="";
+  h.appendChild(el("div","plansteps",[0,1,2].map(i=>`<span class="${i<=planStep?"on":""}"></span>`).join("")));
+  const ws=weekStart(), we=addD(ws,6), nm=DB.data.child.name;
+  const nav=(back,nextLabel,onNext)=>{ const r=el("div","btn-row");
+    const n=el("button","btn go",nextLabel); n.onclick=onNext; r.appendChild(n);
+    if(back){ const b=el("button","btn ghost","◂ חזרה"); b.onclick=()=>{ planStep--; renderPlan(); }; r.appendChild(b); }
+    if(DEV){ const sk=el("button","btn ghost","דילוג (מצב בודק)"); sk.onclick=finishPlan; r.appendChild(sk); }
+    h.appendChild(r); };
+  if(planStep===0){
+    h.appendChild(el("h2",null,`🗓️ ${nm?nm+", ":""}שבוע חדש — בואו נתכנן`));
+    h.appendChild(el("p","lead",`פעם בשבוע מתכננים את השבוע, ורק אחר כך ממשיכים למשחק. שלב 1 מתוך 3: מה קבוע השבוע? חוגים, צהרון, מורה פרטית, תנועת נוער… (${dayLabel(ymd(ws))} עד ${dayLabel(ymd(we))})`));
+    renderWeekGrid(h,true,renderPlan);
+    nav(false,"המשך ▸",()=>{ planStep=1; renderPlan(); });
+  }else if(planStep===1){
+    h.appendChild(el("h2",null,"📝 מבחנים, עבודות ושיעורי בית"));
+    h.appendChild(el("p","lead","שלב 2 מתוך 3: יש השבוע או בשבוע הבא מבחן או עבודה להגשה? מוסיפים — והמערכת מחלקת לשלבים על פני הימים שלפני. אפשר לשנות כל שלב."));
+    const horizon=ymd(addD(we,7));
+    renderTaskList(h,t=>t.due_date>=ymd(todayD())&&t.due_date<=horizon,renderPlan);
+    nav(true,"המשך ▸",()=>{ planStep=2; renderPlan(); });
+  }else{
+    h.appendChild(el("h2",null,"✅ בדיקה אחרונה"));
+    h.appendChild(el("p","lead","שלב 3 מתוך 3: ככה נראה השבוע. הצבע מראה כמה עמוס כל יום."));
+    renderWeekGrid(h,false);
+    const w=weekWarnings();
+    if(w.length) w.forEach(x=>h.appendChild(el("div","warn","⚠️ "+x)));
+    else h.appendChild(el("div","good-box","👍 השבוע נראה מאוזן — אין התנגשויות ואין יום עמוס מדי."));
+    nav(true,"סיימתי לתכנן את השבוע ✓",finishPlan);
+  }
+  h.appendChild(el("p","parent-note",`להורים: התכנון השבועי נפתח כל יום ${DAYN[gate().day]}. אפשר לכבות או לשנות יום במסך ההורה.`));
+  say(["מה קבוע השבוע? מוסיפים חוגים ומסגרות.","יש מבחנים או עבודות? מוסיפים — ונחלק לשלבים.","עוד בדיקה אחת — ומסיימים."][planStep]);
+}
+function finishPlan(){
+  (DB.data.weekPlans=DB.data.weekPlans||{})[weekId()]={done:true,at:new Date().toISOString()};
+  (DB.data.daily=DB.data.daily||{})[ymd(todayD())]={done:true,type:"plan",week:weekKey(),at:new Date().toISOString()};
+  DB.save(); planStep=0; SFX.win(); confetti(); toast("השבוע מתוכנן! 🎉");
+  renderMap(); go("map");
+}
+
+/* =====================================================================
+   TEACHING STATIONS: the week, tasks & planning
+   ===================================================================== */
+function weekRowsHTML(){
+  return `<div class="weekrows">${DAYN.map((n,i)=>`<button class="wrow" data-d="${i}"><b>יום ${DAYS[i]}</b><small>00:00</small><span class="bar24"></span><small>23:59</small></button>`).join("")}</div>`;
+}
+function lvWeek(){
+  const host=$("#levelBody"); host.innerHTML="";
+  host.appendChild(el("p","lead","שבוע = 7 ימים, מיום א׳ עד שבת. כל יום הוא קו מ־00:00 עד 23:59 — וכשיום נגמר, מתחיל היום הבא."));
+  const rows=el("div",null,weekRowsHTML()); host.appendChild(rows);
+  const box=el("div"); host.appendChild(box);
+  const T=[
+    {k:"mc",q:"כמה ימים יש בשבוע?",o:[["5",false],["7",true],["12",false]],h:"רמז: ספרו את השורות — מיום א׳ עד שבת."},
+    {k:"mc",q:"מה בא אחרי יום ג׳?",o:[["יום ב׳",false],["יום ד׳",true],["יום ה׳",false]],h:"רמז: א׳, ב׳, ג׳… והבא בתור?"},
+    {k:"tap",d:3,q:"החוג ביום רביעי. לחצו על יום ד׳.",h:"רמז: א׳ ראשון, ב׳ שני, ג׳ שלישי, ד׳ רביעי."},
+    {k:"mc",q:"יום שלישי, השעה 23:59. מה בא דקה אחרי?",o:[["יום שלישי, 24:00",false],["יום רביעי, 00:00",true],["יום שלישי, 00:00",false]],h:"רמז: אחרי 23:59 היום נגמר — ומתחיל היום הבא, מ־00:00."},
+    {k:"mc",q:"אחרי שבת מתחיל…",o:[["יום ו׳",false],["יום א׳ — שבוע חדש",true],["יום ב׳",false]],h:"רמז: כמו שאחרי 23:59 בא 00:00 — אחרי שבת השבוע מתחיל מחדש."},
+    {k:"tap",d:3,q:"יש מבחן ביום חמישי. לחצו על היום שלפני המבחן — שבו כדאי לחזור על החומר.",h:"רמז: היום שלפני ה׳ הוא ד׳."}
+  ];
+  LV.n=T.length; let cur=null, miss=0;
+  const next=first=>{ if(first) LV.score++; LV.i++; setTimeout(draw,800); };
+  rows.addEventListener("click",e=>{ const b=e.target.closest(".wrow"); if(!b||!cur||cur.k!=="tap") return;
+    if(+b.dataset.d===cur.d){ b.classList.add("on"); SFX.ok(); track("week",miss===0,false,miss,0); cur=null; say("נכון!"); next(miss===0); }
+    else{ b.classList.add("no"); SFX.oops(); miss++; say(cur.h); setTimeout(()=>b.classList.remove("no"),600); } });
+  function draw(){
+    $$(".wrow.on",rows).forEach(x=>x.classList.remove("on"));
+    if(LV.i>=T.length){ box.remove(); return levelDone("שבוע = 7 ימים, כל יום מ־00:00 עד 23:59, ואחרי שבת מתחיל שבוע חדש. עכשיו אפשר לתכנן אותו!"); }
+    setBar(LV.i/T.length); box.innerHTML=""; miss=0; cur=T[LV.i];
+    box.appendChild(el("p","qmeta",`משימה ${LV.i+1} מתוך ${T.length}`)); box.appendChild(el("p","q",cur.q));
+    if(cur.k==="mc") mcq(box,shuffle(cur.o),cur.h,next);
+    say(cur.q);
+  }
+  draw();
+}
+function lvPlanLearn(){
+  const host=$("#levelBody"); host.innerHTML="";
+  host.appendChild(el("p","lead","מטלה גדולה מפחידה רק כשעושים אותה ברגע האחרון. מחלקים אותה לשלבים קטנים — קצת בכל יום."));
+  const box=el("div"); host.appendChild(box);
+  const T=[
+    {q:"יש עבודה גדולה להגשה ביום ה׳. מה הכי כדאי?",o:[["לעשות הכול ביום ד׳ בלילה",false],["לחלק לשלבים — קצת בכל יום",true],["לחכות שמישהו יזכיר",false]],h:"רמז: ברגע האחרון אין זמן לתקן, וגם לא ישנים טוב."},
+    {q:"מה השלב הראשון בעבודה?",o:[["להגיש",false],["לאסוף חומר ורעיונות",true],["לכתוב סיכום",false]],h:"רמז: אי אפשר לכתוב לפני שיודעים על מה."},
+    {q:"מבחן ביום ה׳. מתי להתחיל לחזור על החומר?",o:[["ביום ה׳ בבוקר",false],["ביום ד׳ בלילה",false],["כבר ביום ב׳ — קצת כל יום",true]],h:"רמז: שלוש חזרות קצרות עדיפות על אחת ארוכה בלילה שלפני."},
+    {q:"חוג מ־17:00 עד 18:00. ארוחת ערב ב־19:00. שיעורי בית לוקחים 45 דקות. מתי להתחיל אותם?",o:[["16:00",true],["17:15",false],["18:30",false]],h:"רמז: 17:15 נופל על החוג, ו־18:30 ועוד 45 דקות = 19:15 — אחרי ארוחת הערב."},
+    {q:"מחר מבחן, היום חוג, ויש גם שיעורי בית. מה עושים?",o:[["חוג, אחר כך מסכים, ושיעורים בלילה",false],["חזרה למבחן ושיעורים לפני החוג — ואז חוג",true],["הכול אחרי 21:00",false]],h:"רמז: מה שחשוב ודחוף — קודם. ואחרי 21:00 כבר צריך לישון."},
+    {q:"כמה שעות שינה ילדים צריכים בלילה?",o:[["5–6",false],["9–12",true],["14–16",false]],h:"רמז: מי שישן טוב — זוכר את החומר טוב יותר."}
+  ];
+  LV.n=T.length;
+  const next=first=>{ if(first) LV.score++; LV.i++; setTimeout(draw,750); };
+  function draw(){
+    if(LV.i>=T.length){ box.remove(); return levelDone("עכשיו אפשר לתכנן לבד: 🗓️ השבוע ו־📝 מטלות נמצאים למעלה."); }
+    setBar(LV.i/T.length); box.innerHTML=""; const t=T[LV.i];
+    box.appendChild(el("p","qmeta",`משימה ${LV.i+1} מתוך ${T.length}`)); box.appendChild(el("p","q",t.q));
+    mcq(box,shuffle(t.o),t.h,next); say(t.q);
+  }
+  draw();
+}
+
+/* =====================================================================
+   "Did you know?" after each station + the time-trivia bonus station
+   ===================================================================== */
+const FACTS={
+  line:   "יממה היא יום ולילה ביחד — 24 שעות. בכל יממה כדור הארץ מסתובב סביב עצמו סיבוב אחד שלם.",
+  digital:"בשעה אחת יש 3,600 שניות — 60 דקות, ובכל דקה 60 שניות.",
+  twelve: "טייסים, נהגי רכבת וחיילים משתמשים בשעון של 24 שעות — כדי שאף אחד לא יתבלבל בין 8 בבוקר ל־8 בערב.",
+  day:    "ילדים בגיל בית ספר צריכים 9 עד 12 שעות שינה בלילה. שינה טובה עוזרת לזכור את מה שלמדנו.",
+  cycle:  "הצד של כדור הארץ שפונה לשמש נמצא ביום, והצד השני — בלילה. כשאצלנו צהריים, בצד השני של העולם לילה.",
+  pie:    "מבבל העתיקה, שבה ספרו בשישים, הגיעה החלוקה של שעה ל־60 דקות.",
+  hands:  "המחוג הארוך מקיף את השעון 24 פעמים ביממה — פעם בכל שעה. הקצר מקיף רק פעמיים.",
+  round:  "לפני שהיו שעונים, ידעו מה השעה לפי הצל — בשעון שמש. השמש זזה, והצל זז איתה.",
+  half:   "בשעון חול, החול נוזל דרך פתח צר בקצב קבוע. כשכל החול ירד — עבר זמן מסוים.",
+  quarter:"שיעור בבית הספר נמשך בדרך כלל 45 דקות — בדיוק שלושה רבעי שעה.",
+  five:   "אור השמש עובר כ־150 מיליון קילומטר עד שהוא מגיע אלינו — וזה לוקח לו בערך 8 דקות.",
+  week:   "בלוח העברי היום מתחיל בערב — כמו בסיפור הבריאה: 'ויהי ערב ויהי בוקר'. לכן שבת נכנסת ביום שישי בערב.",
+  plan:   "בשינה עמוקה הגוף מפריש הורמון גדילה — אז שינה טובה עוזרת גם לגדול.",
+  quiz:   "בשבוע שלם יש 168 שעות. גם אם כמה מהן הולכות לשיעורי בית — נשארות הרבה לשחק ולישון."
+};
+const TRIVIA=[
+  {q:"כמה דקות יש בשעה?",o:[["30",0],["60",1],["100",0]],x:"בשעה יש 60 דקות — כל העוגה של השעון."},
+  {q:"כמה שניות יש בדקה?",o:[["10",0],["60",1],["100",0]],x:"בדקה יש 60 שניות. נסו לספור לאט עד 60 — זו בערך דקה."},
+  {q:"כמה ימים יש בשבוע?",o:[["5",0],["7",1],["10",0]],x:"7 ימים: ראשון, שני, שלישי, רביעי, חמישי, שישי ושבת."},
+  {q:"כמה חודשים יש בשנה?",o:[["10",0],["12",1],["52",0]],x:"12 חודשים. ו־52? זה מספר השבועות בשנה."},
+  {q:"למה יש יום ולילה?",o:[["כי השמש נכבית בלילה",0],["כי כדור הארץ מסתובב סביב עצמו",1],["כי הירח מסתיר את השמש",0]],x:"כדור הארץ מסתובב סביב עצמו פעם ביממה. הצד שפונה לשמש — ביום, הצד השני — בלילה."},
+  {q:"כמה זמן לוקח לכדור הארץ להקיף את השמש?",o:[["יום",0],["חודש",0],["שנה",1]],x:"סיבוב שלם אחד סביב השמש = שנה."},
+  {q:"בשעון שמש — מה מראה את השעה?",o:[["הצל",1],["מחוג שזז לבד",0],["מספרים שנדלקים",0]],x:"השמש זזה בשמיים, והצל של מקל זז איתה. לפי מקום הצל יודעים מה השעה."},
+  {q:"מה מודדים בשעון חול?",o:[["חום",0],["זמן",1],["משקל",0]],x:"החול עובר דרך פתח צר בקצב קבוע. כשכל החול ירד — עבר זמן מסוים."},
+  {q:"כמה שעות שינה ילדים בגיל בית ספר צריכים בלילה?",o:[["5–6",0],["9–12",1],["14–16",0]],x:"9 עד 12 שעות. שינה טובה עוזרת לזכור, להתרכז ולגדול."},
+  {q:"לאיזה כיוון זזים מחוגי השעון?",o:[["מ־12 ל־1, ואז ל־2…",1],["מ־12 ל־11, ואז ל־10…",0],["פעם לכאן ופעם לכאן",0]],x:"המחוגים זזים מ־12 ל־1, ל־2 וכן הלאה — לכן אומרים 'עם כיוון השעון'."},
+  {q:"כמה פעמים המחוג הקצר מקיף את השעון ביממה?",o:[["פעם אחת",0],["פעמיים",1],["24 פעמים",0]],x:"פעמיים: מחצות עד הצהריים, ומהצהריים עד חצות."},
+  {q:"מה בא אחרי 23:59?",o:[["24:00",0],["00:00",1],["23:60",0]],x:"אחרי 23:59 מגיע 00:00 — חצות, ויום חדש מתחיל."},
+  {q:"השעון הדיגיטלי מראה 20:00. איזו שעה זו?",o:[["שמונה בבוקר",0],["שמונה בערב",1],["שתיים בצהריים",0]],x:"20 פחות 12 = 8, ואחרי הצהריים — אז שמונה בערב."},
+  {q:"כמה רבעי שעה יש בשעה אחת?",o:[["2",0],["4",1],["15",0]],x:"4 רבעים, כל אחד 15 דקות: 15 + 15 + 15 + 15 = 60."},
+  {q:"שיעור בבית הספר נמשך בדרך כלל 45 דקות. זה…",o:[["חצי שעה",0],["שלושה רבעי שעה",1],["שעה שלמה",0]],x:"45 דקות = שלושה רבעים מהעוגה של השעון."},
+  {q:"בלוח העברי, מתי מתחיל היום?",o:[["בחצות",0],["בבוקר",0],["בערב",1]],x:"היום העברי מתחיל בערב — 'ויהי ערב ויהי בוקר'. לכן שבת נכנסת ביום שישי בערב."},
+  {q:"כמה זמן לוקח לירח להקיף את כדור הארץ?",o:[["יום",0],["בערך חודש",1],["שנה",0]],x:"בערך חודש. בלוח העברי כל חודש מתחיל כשהירח מתחדש — ומכאן המילה 'חודש'."},
+  {q:"מתי הגוף גדל הכי הרבה?",o:[["בזמן שינה",1],["בזמן ארוחה",0],["מול הטלוויזיה",0]],x:"בשינה עמוקה הגוף מפריש הורמון גדילה. עוד סיבה טובה לישון מספיק!"},
+  {q:"בשעון קיץ — מה עושים לשעון?",o:[["מזיזים שעה קדימה",1],["מזיזים שעה אחורה",0],["לא עושים כלום",0]],x:"באביב מזיזים את השעון שעה קדימה, כדי שיהיה אור עד מאוחר. בסתיו מחזירים אותו שעה אחורה."},
+  {q:"כמה פעמים המחוג הארוך מקיף את השעון ביממה?",o:[["2",0],["12",0],["24",1]],x:"פעם בכל שעה — ויש 24 שעות ביממה.",older:1},
+  {q:"כמה שעות יש בשבוע שלם?",o:[["70",0],["168",1],["240",0]],x:"24 שעות × 7 ימים = 168 שעות.",older:1},
+  {q:"כמה שניות יש בשעה?",o:[["600",0],["3,600",1],["6,000",0]],x:"60 שניות × 60 דקות = 3,600 שניות.",older:1},
+  {q:"איזה חודש עברי מופיע פעמיים בשנה מעוברת?",o:[["ניסן",0],["אדר",1],["תשרי",0]],x:"בשנה מעוברת יש אדר א׳ ואדר ב׳ — חודש נוסף, כדי שהחגים יישארו בעונה הנכונה.",older:1},
+  {q:"כמה ימים יש בחודש פברואר בשנה רגילה?",o:[["28",1],["30",0],["31",0]],x:"28 ימים. פעם בארבע שנים יש 29 — ואז בשנה יש 366 ימים.",older:1},
+  {q:"כמה זמן לוקח לאור השמש להגיע אלינו?",o:[["שנייה",0],["בערך 8 דקות",1],["יום שלם",0]],x:"האור עובר כ־150 מיליון קילומטר — בערך ב־8 דקות.",older:1},
+  {q:"מאיפה מגיעה החלוקה של שעה ל־60 דקות?",o:[["מהבבלים, שספרו בשישים",1],["ממי שהמציא את הטלפון",0],["מהרומאים, לפני 100 שנה",0]],x:"בבבל העתיקה ספרו בשישים. מהשיטה שלהם הגיעו, הרבה יותר מאוחר, 60 הדקות בשעה ו־60 השניות בדקה.",older:1}
+];
+function lvTrivia(){
+  const host=$("#levelBody"); host.innerHTML="";
+  const older=(DB.data.child.grade||0)>=4;
+  const pool=shuffle(TRIVIA.filter(t=>older||!t.older)), N=Math.min(8,pool.length);
+  LV.n=N;
+  host.appendChild(el("p","lead",`${N} שאלות על זמן, שעונים, השמש והירח. אחרי כל תשובה — הסבר קצר. בכל פעם שמשחקים יש שאלות אחרות.`));
+  const grid=el("div","task-grid"), left=el("div"), right=el("div");
+  grid.append(left,right); host.appendChild(grid);
+  const ICONS=["🧠","🌍","☀️","🌙","⏳","🕰️","⭐","🪐"];
+  function draw(){
+    if(LV.i>=N){ grid.remove();
+      return levelDone(`${LV.score} מתוך ${N} בניסיון ראשון! רוצים עוד? חזרו לתחנה — יהיו שאלות חדשות.`); }
+    setBar(LV.i/N); left.innerHTML="";
+    right.innerHTML=`<div class="hero"><div class="big">${ICONS[LV.i%ICONS.length]}</div></div>`;
+    const t=pool[LV.i];
+    left.appendChild(el("p","qmeta",`שאלה ${LV.i+1} מתוך ${N} · ✓ ${LV.score}`));
+    left.appendChild(el("p","q",t.q));
+    mcq(left,shuffle(t.o.map(([a,b])=>[a,!!b])),"לא בדיוק — נסו תשובה אחרת 🙂",first=>{
+      if(first) LV.score++;
+      left.appendChild(el("div","good-box","💡 "+t.x));
+      const r=el("div","btn-row"); const nb=el("button","btn go",LV.i+1<N?"השאלה הבאה ▸":"לסיום ▸");
+      nb.onclick=()=>{ LV.i++; draw(); }; r.appendChild(nb); left.appendChild(r);
+      say(t.x);
+    });
+    say(t.q);
+  }
+  draw();
+}
+
+
+/* =====================================================================
+   UNDERSTANDING ENGINE — weighted mastery + spaced review (per skill)
+   ===================================================================== */
+const SKILL_OF={line:"day_line",digital:"digital",twelve:"twelve",cycle:"day_night",pie:"fractions",hands:"hands",
+  round:"read_round",half:"read_half",quarter:"read_quarter",five:"read_five",week:"week",plan:"planning"};
+const SKILLN={day_line:"קו היממה",digital:"שעון דיגיטלי",twelve:"12 + 12",day_night:"יום ולילה",fractions:"חצי ורבע (העוגה)",
+  hands:"המחוגים",read_round:"קריאת שעות עגולות",read_half:"קריאת 'וחצי'",read_quarter:"קריאת 'רבע' ו'רבע ל'",
+  read_five:"קריאה בקפיצות של 5",set_clock:"כיוון שעון",week:"ימי השבוע",planning:"תכנון ומטלות",transfer:"זמן בחיים האמיתיים"};
+const INT=[1,1,3,7,14];                       /* box → days until the next review */
+function track(skill,first,hint,tries,rt){
+  if(!skill) return;
+  const S=(DB.data.skills=DB.data.skills||{}), today=ymd(todayD());
+  const s=S[skill]||(S[skill]={score:0,n:0,box:0,next:null,last:null,boxDay:null,hist:[]});
+  let w = (first&&!hint) ? 1 : tries<=1 ? .6 : tries===2 ? .4 : .2;   /* first try 100 · after a hint/1 miss 60 · 2 misses 40 · more 20 */
+  if(first && rt>25) w*=.85;                                         /* slow answers count a little less (weak signal) */
+  s.score=Math.max(0,Math.min(100,Math.round(s.score+0.35*(w*100-s.score))));
+  s.n++;
+  if(!s.firstDay) s.firstDay=today;
+  if(s.firstDay===today) s.firstScore=s.score;      /* "first day" baseline for the pilot report */
+  if(first&&!hint){ if(s.boxDay!==today){ s.box=Math.min(4,s.box+1); s.boxDay=today; } }  /* climbs at most once a day */
+  else { s.box=0; s.boxDay=today; }
+  s.next=ymd(addD(todayD(),INT[s.box])); s.last=today;
+  (s.hist=s.hist||[]).push({d:today,f:first?1:0,h:hint?1:0,t:tries,rt:Math.round(rt||0)});
+  if(s.hist.length>20) s.hist.shift();
+  DB.save();
+}
+const mLabel=sc=>sc>=80?"✅ שליטה":sc>=50?"🟡 בדרך":"🔁 צריך חזרה";
+const mColor=sc=>sc>=80?"#2fb272":sc>=50?"#ffc43d":"#e8833c";
+function mbar(levelId){
+  const s=(DB.data.skills||{})[SKILL_OF[levelId]]; if(!s) return "";
+  return `<div class="mbar" title="שליטה ${s.score}%"><i style="width:${s.score}%;background:${mColor(s.score)}"></i></div>`;
+}
+
+/* ---------- worked examples: shown when a skill is still below 60 ---------- */
+const EXAMPLES={
+  day_line:    {t:"היממה מתחילה ב־00 — חצות — ונגמרת ב־23. אחרי 23 בא שוב 00, ויום חדש מתחיל. למשל: 7 בבוקר היא המשבצת השביעית אחרי 00.",e:"📏"},
+  digital:     {t:"ב־07:59 — 07 הן השעות ו־59 הדקות. עוד דקה? אין 60 דקות, אז השעה עולה והדקות חוזרות ל־00: ‏08:00.",d:[7,59]},
+  twelve:      {t:"13:00 — מחסירים 12: ‏13 פחות 12 = 1. אז 13:00 זו אחת אחר הצהריים, והמחוג הקצר על ה־1.",d:[13,0]},
+  day_night:   {t:"לילה — מ־20:00 עד 06:00, עם הירח. יום — מ־06:00 עד 20:00, עם השמש. למשל 22:00 — לילה.",e:"🌗"},
+  fractions:   {t:"שעה = עוגה שלמה = 60 דקות. חצי עוגה = 30. רבע = 15. שלושה רבעים = 15 + 15 + 15 = 45.",p:.75},
+  hands:       {t:"המחוג הקצר והאדום — שעות. הארוך והכחול — דקות. ב־3:00 הקצר על ה־3 והארוך על ה־12.",c:[3,0]},
+  read_round:  {t:"כשהמחוג הארוך על ה־12 — השעה עגולה. הקצר על ה־8? אז השעה 8:00.",c:[8,0]},
+  read_half:   {t:"ב־4:30 הארוך על ה־6 — חצי סיבוב — והקצר באמצע הדרך בין 4 ל־5. זה ארבע וחצי.",c:[4,30]},
+  read_quarter:{t:"ב־2:45 המחוג הקצר כמעט על ה־3, והארוך על ה־9. זה רבע ל־3.",c:[2,45]},
+  read_five:   {t:"כל מספר בשעון שווה 5 דקות. הארוך על ה־4? ‏4 × 5 = 20 דקות. הקצר קצת אחרי ה־8 — אז 8:20.",c:[8,20]},
+  set_clock:   {t:"לכוון 6:15: קודם המחוג הקצר ל־6, ואז הארוך ל־3 — כי רבע שעה = 15 דקות.",c:[6,15]},
+  week:        {t:"א׳, ב׳, ג׳, ד׳, ה׳, ו׳, ש׳ — ואחרי שבת שוב א׳, שבוע חדש. למשל: אחרי ג׳ בא ד׳.",e:"🗓️"},
+  planning:    {t:"מבחן ביום ה׳? מחלקים: ב׳ — לקרוא, ג׳ — לתרגל, ד׳ — חזרה קצרה ולישון טוב.",e:"📝"},
+  transfer:    {t:"חוג ב־16:30 והדרך לוקחת 15 דקות? מחסירים: 16:30 פחות 15 דקות = 16:15. יוצאים ב־16:15.",d:[16,15]}
+};
+/* struggling = below 60 AND the latest attempt was not right on the first try
+   (a brand-new skill starts low on purpose, so "low" alone is not "struggling") */
+function struggling(skill){
+  const s=(DB.data.skills||{})[skill]; if(!s) return false;
+  const h=s.hist||[];
+  if(h.length) return s.score<60 && h[h.length-1].f===0;
+  return s.score<60 && s.n>=3;
+}
+function exampleCard(skill,lead){
+  const ex=EXAMPLES[skill]; if(!ex) return null;
+  const vis = ex.c ? miniClock(ex.c[0],ex.c[1],88) : ex.p ? pieSVG(ex.p,"",88)
+            : ex.d ? `<div style="direction:ltr;font-weight:900;font-size:26px;background:var(--ink);color:#8ff3c0;border-radius:12px;padding:6px 10px">${pad(ex.d[0])}:${pad(ex.d[1])}</div>`
+            : `<div style="font-size:44px">${ex.e||"💡"}</div>`;
+  return el("div","excard",`<div class="ex-lead">💪 ${lead}</div><div class="ex-body">${vis}<p>${ex.t}</p></div>`);
+}
+
+/* ---------- question generators (review + transfer) ---------- */
+const RR=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+function readQ(mode,skill){
+  const t=genTime(mode), alts=[];
+  while(alts.length<2){ const a=genTime(mode); if(!(a.h===t.h&&a.m===t.m)&&!alts.some(x=>x.h===a.h&&x.m===a.m)) alts.push(a); }
+  const lab=o=>`${pad(o.h)}:${pad(o.m)} · ${shortWords(o.h,o.m)}`;
+  return {skill,q:"איזו שעה מראה השעון?",vis:{clock:[t.h,t.m]},o:[[lab(t),1],...alts.map(a=>[lab(a),0])],
+    h:"רמז: קודם המחוג הקצר — השעה. אחר כך הארוך — הדקות.",
+    x:`המחוג הארוך על ה־${t.m?t.m/5:12}, הקצר ליד ה־${t.h} — ${shortWords(t.h,t.m)}.`};
+}
+function genFor(skill){
+  switch(skill){
+    case "read_round": case "read_half": case "read_quarter": case "read_five": return readQ(skill.slice(5),skill);
+    case "set_clock": return readQ(pick(["half","quarter"]),"set_clock");
+    case "hands": return {skill,q:"איזה מחוג מראה את השעות?",vis:{clock:[3,0]},o:[["הקצר — האדום",1],["הארוך — הכחול",0],["שניהם ביחד",0]],
+      h:"רמז: השעות זזות לאט.",x:"המחוג הקצר והאדום מראה שעות. הארוך והכחול — דקות."};
+    case "digital": { const h=RR(7,10), m=Math.random()<.4?59:RR(1,48);
+      const nx=m===59?`${pad(h+1)}:00`:`${pad(h)}:${pad(m+1)}`;
+      return {skill,q:`השעה ${pad(h)}:${pad(m)}. מה השעה דקה אחרי?`,vis:{digi:[h,m]},
+        o:[[nx,1],[`${pad(h+1)}:${pad(m)}`,0],[m===59?`${pad(h)}:60`:`${pad(h)}:${pad(m-1)}`,0]],
+        h:m===59?"רמז: אין 60 דקות — אחרי 59 מתחילה שעה חדשה.":"רמז: רק הדקות עולות ב־1.",x:`דקה אחרי ${pad(h)}:${pad(m)} = ${nx}.`}; }
+    case "twelve": { const H=RR(13,23);
+      return {skill,q:`השעה ${H}:00. איזו שעה זו אם סופרים רק עד 12?`,vis:{digi:[H,0]},o:[[String(H-12),1],[String(H-10),0],[String(H),0]],
+        h:"רמז: מחסירים 12.",x:`${H} פחות 12 = ${H-12} — ${words(H,0)}.`}; }
+    case "day_line": return pick([
+      {skill,q:"מה בא אחרי 23?",vis:{e:"🌙"},o:[["24",0],["00 — יום חדש",1],["22",0]],h:"רמז: אחרי 23 היום נגמר.",x:"אחרי 23 מתחיל יום חדש — שוב מ־00."},
+      {skill,q:"כמה שעות יש ביממה?",vis:{e:"📏"},o:[["12",0],["24",1],["60",0]],h:"רמז: יום ולילה ביחד.",x:"24 שעות: מ־00:00 ועד 23:59."},
+      {skill,q:"באיזו שעה מתחיל היום?",vis:{e:"🌙"},o:[["06:00",0],["12:00",0],["00:00",1]],h:"רמז: בחצות.",x:"היום מתחיל בחצות — 00:00."}]);
+    case "day_night": { const H=pick([1,3,8,11,14,16,22,23]), night=(H>=20||H<6);
+      return {skill,q:`השעה ${pad(H)}:00 — יום או לילה?`,vis:{e:night?"🌙":"☀️"},o:[["☀️ יום",!night],["🌙 לילה",night]],
+        h:"רמז: לילה זה מ־20 בערב ועד 6 בבוקר.",x:`${pad(H)}:00 — ${night?"לילה":"יום"}.`}; }
+    case "fractions": { const [n,v,f]=pick([["רבע שעה",15,.25],["חצי שעה",30,.5],["שלושה רבעי שעה",45,.75]]);
+      return {skill,q:`${n} — כמה דקות זה?`,vis:{html:pieSVG(f,"",190)},o:[["15",v===15],["30",v===30],["45",v===45]],
+        h:"רמז: שעה שלמה = 60 דקות. רבע = 15.",x:`${n} = ${v} דקות.`}; }
+    case "week": { const i=RR(0,6), nx=(i+1)%7;
+      return {skill,q:i===6?"אחרי שבת מתחיל…":`מה בא אחרי יום ${DAYS[i]}?`,vis:{e:"🗓️"},
+        o:[[`יום ${DAYS[nx]}`,1],[`יום ${DAYS[(i+6)%7]}`,0],[`יום ${DAYS[(i+2)%7]}`,0]],
+        h:"רמז: א׳, ב׳, ג׳, ד׳, ה׳, ו׳, ש׳ — ושוב א׳.",x:`אחרי יום ${DAYS[i]} בא יום ${DAYS[nx]}.`}; }
+    case "planning": return pick([
+      {skill,q:"מבחן ביום ה׳. מתי להתחיל לחזור?",vis:{e:"📝"},o:[["ביום ה׳ בבוקר",0],["ביום ד׳ בלילה",0],["כבר ביום ב׳ — קצת כל יום",1]],h:"רמז: כמה חזרות קצרות עדיפות על אחת ארוכה.",x:"מתחילים מוקדם ומחלקים — קצת בכל יום."},
+      {skill,q:"יש עבודה גדולה. מה הצעד הראשון?",vis:{e:"📚"},o:[["להגיש",0],["לאסוף חומר ורעיונות",1],["לכתוב סיכום",0]],h:"רמז: אי אפשר לכתוב לפני שיודעים על מה.",x:"קודם אוספים חומר, אחר כך כותבים, ובסוף בודקים ומגישים."}]);
+    default: return genTransfer();
+  }
+}
+function genTransfer(){
+  const sched=DB.data.daily_schedule||[], week=DB.data.week||[], S=DB.data.settings;
+  const hob=week.length?pick(week):null, hn=hob?hob.nm:"החוג", ht=hob?toMin(hob.time):16*60+30;
+  const wake=toMin((sched.find(x=>x.activity==="wake_up")||{}).time||S.wake||"07:00");
+  const bedI=sched.find(x=>x.activity==="bedtime"), bed=toMin(bedI?bedI.time:(S.sleep||"21:00"));
+  const sleepH=Math.round(((24*60-bed)+wake)/30)/2;
+  const hTxt=x=>Number.isInteger(x)?String(x):`${Math.floor(x)} וחצי`;
+  const gens=[
+    ()=>{ const w=pick([10,15,20]); return {q:`${hn} מתחיל ב־${toHM(ht)}. הדרך לוקחת ${w} דקות. מתי צריך לצאת מהבית?`,
+      o:[[toHM(ht-w),1],[toHM(ht+w),0],[toHM(ht-w-30),0]],h:`רמז: יוצאים לפני — ${toHM(ht)} פחות ${w} דקות.`,x:`${toHM(ht)} פחות ${w} דקות = ${toHM(ht-w)}.`,vis:{digi:[Math.floor(ht/60),ht%60]}}; },
+    ()=>{ const out=7*60+pick([30,40,45]), w=pick([15,20]); return {q:`יוצאים מהבית ב־${toHM(out)}. הדרך לבית הספר לוקחת ${w} דקות. מתי מגיעים?`,
+      o:[[toHM(out+w),1],[toHM(out-w),0],[toHM(out+w+10),0]],h:`רמז: מוסיפים ${w} דקות.`,x:`${toHM(out)} ועוד ${w} דקות = ${toHM(out+w)}.`,vis:{e:"🎒"}}; },
+    ()=>{ const st=pick([8*60,9*60,10*60+15]); return {q:`השיעור מתחיל ב־${toHM(st)} ונמשך 45 דקות. מתי הוא נגמר?`,
+      o:[[toHM(st+45),1],[toHM(st+60),0],[toHM(st+30),0]],h:"רמז: 45 דקות = שלושה רבעי שעה.",x:`${toHM(st)} ועוד 45 דקות = ${toHM(st+45)}.`,vis:{html:pieSVG(.75,"45 דקות",170)}}; },
+    ()=>{ const end=ht+60, ext=pick([15,20,30]); return {q:`${hn} נגמר ב־${toHM(end)}, אבל היום הוא התארך ב־${ext} דקות. מתי הוא נגמר?`,
+      o:[[toHM(end+ext),1],[toHM(end-ext),0],[toHM(end+60),0]],h:`רמז: מוסיפים ${ext} דקות.`,x:`${toHM(end)} ועוד ${ext} דקות = ${toHM(end+ext)}.`,vis:{e:"⏱️"}}; }
+  ];
+  if(sleepH>=6&&sleepH<=13) gens.push(()=>({q:`הולכים לישון ב־${toHM(bed)} וקמים ב־${toHM(wake)}. כמה שעות שינה זה?`,
+    o:[[hTxt(sleepH),1],[hTxt(sleepH-2),0],[hTxt(sleepH+2),0]],h:"רמז: סופרים מהשעה של השינה עד חצות, ואז מחצות עד הבוקר.",
+    x:`מ־${toHM(bed)} עד ${toHM(wake)} = ${hTxt(sleepH)} שעות.${sleepH<9?" זה פחות מהמומלץ (9–12).":""}`,vis:{e:"😴"}}));
+  return {skill:"transfer",...pick(gens)()};
+}
+function genChallenge(){
+  const w=DB.data.week||[], hob=(w.find(x=>/חוג|אימון/.test(x.nm))||{}).nm||"חוג", tut=(w.find(x=>/מורה/.test(x.nm))||{}).nm||"מורה פרטית";
+  return {skill:"planning",vis:{e:"🎯"},
+    q:`מחר יש מבחן. היום יש ${hob} ב־17:00 ו${tut} ב־18:30, וארוחת ערב ב־19:30. מה התוכנית הכי טובה לערב?`,
+    o:[[`16:00 חזרה למבחן ← 17:00 ${hob} ← 18:30 ${tut} ← 19:30 ארוחה ← 21:00 לישון`,1],
+       [`17:00 ${hob} ← 18:30 ${tut} ← 19:30 ארוחה ← 21:30 חזרה למבחן`,0],
+       [`16:00 מסכים ← 17:00 ${hob} ← 18:30 ${tut} ← אחרי 22:00 חזרה למבחן`,0]],
+    h:"רמז: מה שחשוב ודחוף — קודם. ובלילה שלפני מבחן — לישון בזמן.",
+    x:"חוזרים על החומר לפני החוגים, כשעוד יש כוח — ואז הולכים לישון בזמן ומגיעים רעננים למבחן."};
+}
+
+/* =====================================================================
+   DAILY JOURNEY — one short personal mission each day
+   ===================================================================== */
+let TODAY_M=null, SKIP_TODAY=null;
+const weekKey=()=>{ let d=todayD(); while(d.getDay()!==0) d=addD(d,-1); return ymd(d); };
+function dailyPending(){
+  const t=ymd(todayD());
+  return !!(DB.data.settings.onboarded && SKIP_TODAY!==t && !((DB.data.daily||{})[t]||{}).done);
+}
+function completeDaily(type){
+  (DB.data.daily=DB.data.daily||{})[ymd(todayD())]={done:true,type,week:weekKey(),at:new Date().toISOString()}; DB.save();
+  cloudSync("daily",true);
+}
+function pickMission(){
+  const t=ymd(todayD()), g=DB.data.child.grade||0;
+  for(const task of (DB.data.tasks||[]).filter(x=>!x.done).sort((a,b)=>a.due_date.localeCompare(b.due_date))){
+    const st=(task.steps||[]).find(s=>!s.done && s.date<=t); if(st) return {day:t,type:"step",task,step:st};
+  }
+  const due=Object.entries(DB.data.skills||{}).filter(([,s])=>s.next&&s.next<=t).sort((a,b)=>a[1].score-b[1].score).map(([k])=>k);
+  if(due.length){ const sk=due.slice(0,3); while(sk.length<3) sk.push(sk[0]); return {day:t,type:"review",skills:sk}; }
+  if(todayD().getDay()===2 && g>=4 && !Object.values(DB.data.daily||{}).some(d=>d.type==="challenge"&&d.week===weekKey())) return {day:t,type:"challenge"};
+  const nx=nextLevel(), young=g<=2 && !prog("five")?.done;
+  if(nx && (young || !Object.keys(DB.data.skills||{}).length || Math.random()<.5)) return {day:t,type:"station",lvl:nx};
+  if(young) return {day:t,type:"review",skills:["day_line","day_night","week"]};
+  return {day:t,type:"transfer"};
+}
+function weekStory(){
+  let d=todayD(); while(d.getDay()!==0) d=addD(d,-1);
+  const t=ymd(todayD()); let n=0;
+  const dots=DAYS.map((dn,i)=>{ const s=ymd(addD(d,i)), done=((DB.data.daily||{})[s]||{}).done; if(done) n++;
+    return `<span class="dot${done?" on":""}${s===t?" now":""}"><b>${done?"✓":""}</b><small>${dn}</small></span>`; }).join("");
+  return el("div","story",`<div class="story-t">📖 סיפור השבוע: ${n} מתוך 7 פרקים${n===7?" — שבוע מושלם! 🌟":""}</div><div class="dots">${dots}</div>`);
+}
+function runQs(body,qs,onEnd){
+  let i=0, firsts=0; const shown=new Set();
+  const grid=el("div","task-grid"), left=el("div"), right=el("div","clock-wrap"); grid.append(left,right); body.appendChild(grid);
+  function draw(){
+    if(i>=qs.length) return onEnd(firsts,qs.length);
+    left.innerHTML=""; right.innerHTML="";
+    const t=qs[i];
+    if(t.skill && EXAMPLES[t.skill] && !shown.has(t.skill) && struggling(t.skill)){
+      shown.add(t.skill);
+      right.innerHTML=`<div class="hero"><div class="big">💡</div></div>`;
+      left.appendChild(el("p","qmeta",`לפני השאלה · ${SKILLN[t.skill]||""}`));
+      left.appendChild(exampleCard(t.skill,"זה עוד קצת קשה — הנה דוגמה קטנה:"));
+      const r=el("div","btn-row"); const nb=el("button","btn go","הבנתי — לשאלה ▸"); nb.onclick=draw; r.appendChild(nb); left.appendChild(r);
+      say(EXAMPLES[t.skill].t); return;
+    }
+    if(t.vis&&t.vis.clock) new Clock(right,{interactive:false,inner:false,readout:false}).set(t.vis.clock[0],t.vis.clock[1]);
+    else if(t.vis&&t.vis.digi) right.innerHTML=digiBox(t.vis.digi[0],t.vis.digi[1]);
+    else if(t.vis&&t.vis.html) right.innerHTML=t.vis.html;
+    else right.innerHTML=`<div class="hero"><div class="big">${(t.vis&&t.vis.e)||"🧭"}</div></div>`;
+    left.appendChild(el("p","qmeta",`שאלה ${i+1} מתוך ${qs.length}${t.skill&&SKILLN[t.skill]?" · "+SKILLN[t.skill]:""}`));
+    left.appendChild(el("p","q",t.q));
+    mcq(left,shuffle(t.o.map(([a,b])=>[a,!!b])),t.h,first=>{
+      if(first) firsts++;
+      if(t.skill==="transfer" && first) left.appendChild(el("div","good-box","🌟 לא רק ידעת מה השעה — ידעת מה לעשות איתה!"));
+      left.appendChild(el("div","good-box","💡 "+t.x));
+      const r=el("div","btn-row"); const nb=el("button","btn go",i+1<qs.length?"הבאה ▸":"סיום ▸");
+      nb.onclick=()=>{ i++; draw(); }; r.appendChild(nb); left.appendChild(r);
+    },t.skill);
+    say(t.q);
+  }
+  draw();
+}
+function renderToday(){
+  const h=$("#todayBody"); h.innerHTML="";
+  const c=DB.data.child, now=new Date(), hr=now.getHours(), td=todayD();
+  const greet=hr<5?"לילה טוב":hr<12?"בוקר טוב":hr<17?"צהריים טובים":hr<21?"ערב טוב":"לילה טוב";
+  h.appendChild(el("h2",null,`☀️ היום של ${c.name||""}`));
+  h.appendChild(el("p","lead",`${greet}! יום ${DAYN[td.getDay()]} · ${td.getDate()}/${td.getMonth()+1} · השעה ${pad(hr)}:${pad(now.getMinutes())}`));
+  if(!TODAY_M || TODAY_M.day!==ymd(td)) TODAY_M=pickMission();
+  const m=TODAY_M, body=el("div"); h.appendChild(body);
+  const footer=el("div"); h.appendChild(footer);
+  const finish=(type,msg)=>{
+    completeDaily(type); SFX.win(); confetti(); TODAY_M=null;
+    h.innerHTML=""; h.appendChild(el("h2",null,`☀️ היום של ${c.name||""}`));
+    h.appendChild(el("div","good-box",msg)); h.appendChild(weekStory());
+    const r=el("div","btn-row"); const b=el("button","btn go","קדימה למפה ▸"); b.onclick=()=>{ renderMap(); go("map"); };
+    r.appendChild(b); h.appendChild(r); say(msg);
+  };
+  if(m.type==="step"){
+    const t=m.task;
+    body.appendChild(el("div","mission",`⏳ יש לך 3 דקות: בדיקת מטלה שמתקרבת.`));
+    body.appendChild(el("p","q",`📝 ${m.step.title}`));
+    body.appendChild(el("p","lead",`בשביל: ${TT[t.type].nm} — ${t.title} · עד ${dayLabel(t.due_date)}. עשית את השלב הזה?`));
+    const r=el("div","btn-row");
+    const yes=el("button","btn go","✅ עשיתי"), no=el("button","btn ghost","⏰ עוד לא — נעביר למחר");
+    yes.onclick=()=>{ m.step.done=true; if((t.steps||[]).every(s=>s.done)) t.done=true; DB.save(); track("planning",true,false,0,0);
+      finish("step",t.done?`🎉 ${t.title} — כל השלבים הושלמו!`:"💪 עוד שלב מאחוריך. ככה מגיעים מוכנים."); };
+    no.onclick=()=>{ m.step.date=ymd(addD(todayD(),1)); DB.save(); track("planning",false,false,1,0);
+      finish("step",m.step.date>=t.due_date?"⚠️ העברנו למחר — אבל מחר זה כבר יום ההגשה. כדאי להתחיל היום, אפילו קצת.":"🙂 בסדר — העברנו למחר. רק לא לדחות שוב."); };
+    r.append(yes,no); body.appendChild(r);
+    say(`עשית את השלב "${m.step.title}"?`);
+  }
+  else if(m.type==="station"){
+    body.appendChild(el("div","mission","🧭 המשימה של היום: התחנה הבאה במסע."));
+    const b=el("button","btn sun wide",`${m.lvl.ic} ${m.lvl.nm} — יוצאים לדרך ▸`);
+    b.onclick=()=>{ completeDaily("station"); TODAY_M=null; openLevel(m.lvl.id); };
+    const r=el("div","btn-row"); r.appendChild(b); body.appendChild(r);
+    say(`המשימה של היום: ${m.lvl.nm}.`);
+  }
+  else{
+    const intro={review:"🔁 יש לך 3 דקות: בואו נבדוק שזה עדיין זכור.",transfer:"🧭 יש לך 3 דקות: זמן בחיים האמיתיים.",
+                 challenge:"🎯 יום מאתגר! תרחיש אחד — מה הכי נכון לעשות?"}[m.type];
+    body.appendChild(el("div","mission",intro));
+    let qs;
+    if(m.type==="review") qs=m.skills.map(genFor);
+    else if(m.type==="challenge") qs=[genChallenge()];
+    else { const a=genTransfer(); let b=genTransfer(), k=0; while(b.q===a.q&&k++<10) b=genTransfer(); qs=[a,b]; }
+    runQs(body,qs,(ok,n)=>finish(m.type, ok===n?`🌟 ${ok} מתוך ${n} בניסיון ראשון — מצוין!`:`👍 ${ok} מתוך ${n} בניסיון ראשון. מה שהיה קשה — נחזור עליו בקרוב.`));
+  }
+  footer.appendChild(weekStory());
+  const skip=el("button","linkbtn","אחר כך"); skip.onclick=()=>{ SKIP_TODAY=ymd(todayD()); renderMap(); go("map"); };
+  footer.appendChild(skip);
+}
+
+/* =====================================================================
+   VOICE — Hebrew text-to-speech (Web Speech API)
+   ===================================================================== */
+const VOICE={he:null,all:0,lastErr:null};
+function loadVoices(){
+  try{ const vs=window.speechSynthesis.getVoices()||[]; VOICE.all=vs.length;
+    VOICE.he=vs.find(v=>/^(he|iw)/i.test(v.lang))||vs.find(v=>/hebrew|עברית/i.test(v.name))||null; }catch(e){}
+  try{ document.body.classList.toggle("novoice",!VOICE.he); }catch(e){}
+}
+if("speechSynthesis" in window){
+  loadVoices();
+  try{ window.speechSynthesis.addEventListener("voiceschanged",loadVoices); }catch(e){}
+  let k=0; const iv=setInterval(()=>{ loadVoices(); if(VOICE.he || ++k>12) clearInterval(iv); },400);   /* some browsers never fire voiceschanged */
+}else{ try{ document.body.classList.add("novoice"); }catch(e){} }
+function voiceMode(){ try{ return DB.data.settings.voice || ((DB.data.child.grade||0)<=2?"auto":"button"); }catch(e){ return "button"; } }
+function cleanSpeech(text){
+  return String(text).replace(/[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{2B00}-\u{2BFF}\uFE0F\u200D]/gu,"").replace(/[▸◂▲▼✓×⣿]/g,"").replace(/\s+/g," ").trim();
+}
+let UTT=null;                                   /* keep a reference: Chromium may drop un-referenced utterances */
+function speak(text,force,hooks){
+  if(!("speechSynthesis" in window)) return false;
+  if(!VOICE.he) loadVoices();
+  if(!VOICE.he){ if(force) toast("הקראה לא זמינה בדפדפן הזה. נסו Microsoft Edge, או התקינו קול עברי.",true); return false; }
+  const t=cleanSpeech(text); if(!t) return false;
+  const sp=window.speechSynthesis;
+  try{ if(sp.speaking||sp.pending) sp.cancel(); if(sp.resume) sp.resume(); }catch(e){}
+  const u=new SpeechSynthesisUtterance(t); UTT=u;
+  u.voice=VOICE.he; u.lang=VOICE.he.lang; u.rate=.92;
+  u.onstart=()=>{ VOICE.lastErr=null; hooks&&hooks.start&&hooks.start(); };
+  u.onerror=e=>{ const er=(e&&e.error)||"error"; if(er==="interrupted"||er==="canceled") return;
+    VOICE.lastErr=er; hooks&&hooks.error&&hooks.error(er); if(force&&!hooks) toast("ההקראה נכשלה ("+er+")",true); };
+  setTimeout(()=>{ try{ sp.speak(u); }catch(e){ VOICE.lastErr=String(e); } },80);   /* cancel()+speak() in the same tick is dropped by Chromium */
+  return true;
+}
+function voiceDiagnosis(){
+  if(!("speechSynthesis" in window)) return "❌ הדפדפן הזה לא תומך בהקראה בכלל.";
+  if(VOICE.he) return `✅ נמצא קול עברי: ${VOICE.he.name}.`;
+  const brave=!!(navigator.brave);
+  return `❌ לא נמצא קול עברי — נמצאו ${VOICE.all} קולות בסך הכול.`+
+    (brave?" אתם ב־Brave, שעשוי להגביל את רשימת הקולות כהגנת פרטיות.":"")+
+    " הפתרון: לפתוח את המשחק ב־Microsoft Edge (יש בו קולות עבריים מובנים), או להתקין קול עברי ב־Windows: הגדרות ← זמן ושפה ← דיבור ← הוספת קולות ← עברית. עד אז כפתורי 🔊 מוסתרים.";
+}
+try{ $(".owl").onclick=()=>speak($("#bubble").textContent,true); }catch(e){}
+
+/* =====================================================================
+   PILOT REPORT — anonymous summary the parent copies and sends
+   ===================================================================== */
+function pilotReport(){
+  const d=DB.data, c=d.child, t=ymd(todayD());
+  if(!d.settings.pilotId){ d.settings.pilotId=Math.random().toString(36).slice(2,6).toUpperCase(); DB.save(); }
+  const daily=d.daily||{}, keys=Object.keys(daily).sort(), start=keys[0]||t;
+  const span=Math.max(1,diffD(parseD(start),todayD())+1);
+  const doneDays=Object.values(daily).filter(x=>x.done).length;
+  const last14=[...Array(14)].map((_,i)=>((daily[ymd(addD(todayD(),i-13))]||{}).done?"✓":"·")).join("");
+  const TN={step:"מטלה",review:"חזרה",challenge:"יום מאתגר",transfer:"זמן בחיים",station:"תחנה",plan:"תכנון שבועי",onboarding:"הרשמה"};
+  const types={}; Object.values(daily).forEach(x=>{ if(x.done&&x.type) types[x.type]=(types[x.type]||0)+1; });
+  const main=LEVELS.filter(l=>!l.bonus), st=main.filter(l=>prog(l.id)?.done);
+  const sk=Object.entries(d.skills||{}).sort((a,b)=>a[1].score-b[1].score);
+  const tasks=d.tasks||[], tDone=tasks.filter(x=>x.done).length;
+  const lines=[
+    "📤 דוח פיילוט — סיפור של יממה",
+    `קוד משפחה: ${d.settings.pilotId} · כיתה ${c.grade?GRADES[c.grade-1][0]:"?"} · ${c.gender==="m"?"בן":"בת"}`,
+    `${dayLabel(t)} · יום ${span} בפיילוט (התחלה: ${dayLabel(start)})`,
+    "",
+    `☀️ מסע היום: ${doneDays} ימים מתוך ${span}`,
+    `14 הימים האחרונים (ישן ← חדש): ${last14}`,
+    `סוגי משימות: ${Object.entries(types).map(([k,v])=>`${TN[k]||k} ${v}`).join(", ")||"—"}`,
+    "",
+    `🗺️ תחנות שהושלמו: ${st.length} מתוך ${main.length}${st.length?" ("+st.map(l=>l.nm).join(", ")+")":""}`,
+    "",
+    "🎯 שליטה במיומנויות (יום ראשון ← היום):",
+    ...(sk.length?sk.map(([k,v])=>`• ${SKILLN[k]||k}: ${v.firstScore!=null?v.firstScore:"—"} ← ${v.score} · ${mLabel(v.score)} · ${v.n} תשובות`):["• עוד אין נתונים"]),
+    "",
+    `📝 מטלות: ${tasks.length} נוצרו, ${tDone} הושלמו · תכנונים שבועיים: ${Object.keys(d.weekPlans||{}).length}`,
+    `🗣️ קול: ${({auto:"הקראה אוטומטית",button:"בלחיצה",off:"כבוי"})[voiceMode()]} · קול עברי ${VOICE.he?"זמין":"לא זמין"}`,
+    "",
+    "—— נתונים לניתוח ——",
+    JSON.stringify(pilotData())
+  ];
+  return lines.join("\n");
+}
+function pilotData(){
+  const d=DB.data, c=d.child, t=ymd(todayD());
+  if(!d.settings.pilotId){ d.settings.pilotId=Math.random().toString(36).slice(2,6).toUpperCase(); DB.save(); }
+  const daily=d.daily||{}, keys=Object.keys(daily).sort(), start=keys[0]||t;
+  const span=Math.max(1,diffD(parseD(start),todayD())+1);
+  const last14=[...Array(14)].map((_,i)=>((daily[ymd(addD(todayD(),i-13))]||{}).done?"✓":"·")).join("");
+  const types={}; Object.values(daily).forEach(x=>{ if(x.done&&x.type) types[x.type]=(types[x.type]||0)+1; });
+  const st=LEVELS.filter(l=>!l.bonus&&prog(l.id)?.done), tasks=d.tasks||[];
+  const sk=Object.entries(d.skills||{}).sort((a,b)=>a[1].score-b[1].score);
+  return {v:1,id:d.settings.pilotId,g:c.grade,s:c.gender,start,span,daily:Object.values(daily).filter(x=>x.done).length,last14,types,
+    days:keys.filter(k=>daily[k].done).slice(-60),
+    stations:st.map(l=>l.id),skills:Object.fromEntries(sk.map(([k,v])=>[k,[v.firstScore!=null?v.firstScore:null,v.score,v.n,v.box]])),
+    tasks:[tasks.length,tasks.filter(x=>x.done).length],plans:Object.keys(d.weekPlans||{}).length,voice:[voiceMode(),!!VOICE.he]};
+}
+function openPilotReport(){
+  const txt=pilotReport();
+  const box=el("div");
+  box.appendChild(el("p","q","📤 דוח פיילוט"));
+  box.appendChild(el("p","lead","הדוח לא כולל את שם הילד. העתיקו אותו ושלחו למי שמנהל את הפיילוט — למשל בוואטסאפ."));
+  const ta=el("textarea","report"); ta.readOnly=true; ta.value=txt; box.appendChild(ta);
+  const r=el("div","btn-row");
+  const cp=el("button","btn go","📋 העתקה");
+  cp.onclick=async()=>{ let ok=false;
+    try{ await navigator.clipboard.writeText(txt); ok=true; }catch(e){}
+    if(!ok){ try{ ta.select(); ok=document.execCommand("copy"); }catch(e){} }
+    toast(ok?"הדוח הועתק — אפשר להדביק ולשלוח":"סמנו את הטקסט והעתיקו ידנית",!ok); };
+  r.appendChild(cp);
+  if(navigator.share){ const sh=el("button","btn ghost","📤 שיתוף"); sh.onclick=()=>navigator.share({title:"דוח פיילוט — סיפור של יממה",text:txt}).catch(()=>{}); r.appendChild(sh); }
+  const cl=el("button","btn ghost","סגירה"); cl.onclick=closeModal; r.appendChild(cl);
+  box.appendChild(r); modal(box);
+}
+$("#pilotBtn").onclick=openPilotReport;
+
+/* =====================================================================
+   CLOUD — anonymous pilot sync (Supabase). Inert until CLOUD.url is set.
+   Sends only pilotData() (no name). Needs parent consent. Never in tester mode.
+   ===================================================================== */
+const CLOUD={url:"",key:"",table:"pilot_snapshots",ver:"v11"};
+const cloudOn=()=>!!(CLOUD.url&&CLOUD.key);
+function deviceId(){
+  const s=DB.data.settings;
+  if(!s.deviceId){ const a=new Uint8Array(9); try{ crypto.getRandomValues(a); }catch(e){ a.forEach((_,i)=>a[i]=Math.random()*256|0); }
+    s.deviceId=[...a].map(x=>x.toString(16).padStart(2,"0")).join(""); DB.save(); }
+  return s.deviceId;
+}
+function cloudSync(reason,force){
+  const s=DB.data.settings;
+  if(!cloudOn()||DEV||s.consent!==true||!s.onboarded) return Promise.resolve(false);
+  const now=Date.now();
+  if(!force && s.lastSync && now-s.lastSync<60*60*1000) return Promise.resolve(false);
+  s.lastSync=now; DB.save();
+  const body=JSON.stringify({device_id:deviceId(),pilot_id:pilotData().id,app_version:CLOUD.ver,reason:reason||"",payload:pilotData()});
+  try{
+    return fetch(CLOUD.url.replace(/\/$/,"")+"/rest/v1/"+CLOUD.table,{method:"POST",keepalive:true,
+      headers:{"Content-Type":"application/json",apikey:CLOUD.key,Authorization:"Bearer "+CLOUD.key,Prefer:"return=minimal"},body})
+      .then(r=>{ if(!r.ok){ s.lastSync=0; DB.save(); } return r.ok; })
+      .catch(()=>{ s.lastSync=0; DB.save(); return false; });
+  }catch(e){ s.lastSync=0; DB.save(); return Promise.resolve(false); }
+}
+function askConsent(){
+  if(!cloudOn()||DEV) return;
+  const box=el("div");
+  box.appendChild(el("p","q","👨‍👩‍👧 להורים — שיתוף נתונים לפיילוט"));
+  box.appendChild(el("p","lead","כדי לשפר את המשחק, הוא יכול לשלוח באופן אוטומטי נתונים אנונימיים: כיתה, אילו תחנות הושלמו, הצלחה בכל מיומנות ובאילו ימים נכנסו. בלי שם ובלי שום פרט מזהה. אפשר לבטל בכל רגע במסך ההורה."));
+  const r=el("div","btn-row");
+  const y=el("button","btn go","✅ מאשרים");
+  y.onclick=()=>{ DB.data.settings.consent=true; DB.save(); closeModal(); cloudSync("consent",true); toast("תודה! הנתונים יישלחו באופן אנונימי"); };
+  const n=el("button","btn ghost","לא עכשיו");
+  n.onclick=()=>{ DB.data.settings.consent=false; DB.save(); closeModal(); };
+  r.appendChild(y); r.appendChild(n); box.appendChild(r); modal(box);
+}
+
+/* ---------- tester helpers ---------- */
+function makeTestProfile(){
+  const c=DB.data.child;
+  Object.assign(c,{name:"בודק",gender:c.gender||"f",grade:c.grade||4,age:9,avatar:"🛠️",known:[],start:"line",level:"line"});
+  DB.data.settings.onboarded=true; DB.save(); paintTop();
+}
+function fillSample(){
+  const ws=weekStart();
+  DB.data.daily_schedule=[["07:00","wake_up",30],["07:30","breakfast",20],["08:00","school",300],["16:00","homework",45],
+    ["17:00","hobby",60],["19:00","dinner",40],["20:00","shower",20],["20:30","bedtime",30]].map(([time,activity,d])=>({time,activity,duration_minutes:d}));
+  DB.data.week=[{day:1,time:"16:30",dur:60,nm:"מורה פרטית",e:"👩‍🏫"},{day:2,time:"17:00",dur:60,nm:"חוג כדורגל",e:"⚽"},
+    {day:3,time:"18:00",dur:120,nm:"תנועת נוער",e:"🏕️"},{day:4,time:"17:00",dur:60,nm:"חוג כדורגל",e:"⚽"}].map(x=>({id:uid(),...x}));
+  const mk=(title,type,dueOff,est)=>{ const t={id:uid(),title,type,due_date:ymd(addD(ws,dueOff)),est,steps:[],done:false,created:ymd(todayD())}; autoSteps(t); return t; };
+  DB.data.tasks=[mk("מדעים","test",3,90),mk("עבודה על בעלי חיים","project",5,180)];
+  DB.save();
+}
+
+/* =====================================================================
+   BOOT
+   ===================================================================== */
+paintMute(); paintTop();
+if(DEV && !DB.data.settings.onboarded) makeTestProfile();
+if(DB.data.settings.onboarded){
+  renderMap(); go("map");
+  if(DB.data.settings.consent===undefined) setTimeout(askConsent,1500); else cloudSync("open");
+  say(`שלום ${DB.data.child.name}! בחרי תחנה במפה.`);
+}else{
+  renderOb(); go("onboard");
+}
+</script>
+</body>
+</html>
