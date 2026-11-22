@@ -273,6 +273,10 @@ body.young .st-intro .st-lead{font-size:23px}
 .voicenote{display:none;align-items:center;gap:10px;flex-wrap:wrap;background:#fff7e6;border:2px solid #ffd27a;border-radius:14px;padding:10px 14px;margin:0 0 12px;font-weight:700;font-size:14.5px}
 body.novoice .voicenote{display:flex}
 .voicenote .linkbtn{margin:0}
+/* ניקוד: משקל רגיל וריווח שורות גדול — בגופן עבה הדגש והחולם נבלעים */
+.nq, .nq *:not(.tag):not(.say-btn){font-weight:500 !important}
+.nq{line-height:2 !important}
+.nq .q, .nq.q, .nq .st-lead{line-height:2 !important;letter-spacing:.01em}
 .devbox{margin-top:22px;border-top:2px solid var(--line);padding-top:16px}
 .linkbtn{background:none;border:0;color:var(--minute);font:inherit;font-weight:700;text-decoration:underline;cursor:pointer;margin-top:12px;padding:0}
 .pin{letter-spacing:12px;text-align:center;font-size:26px!important;max-width:220px!important;display:block;margin:6px auto}
@@ -509,6 +513,7 @@ function nqText(s){
 function nqActive(){ try{ const g=DB.data.child.grade||0; return g>0 && g<=2 && NQ_SCOPE.includes(LV.id) && $("#scr-level").classList.contains("on"); }catch(e){ return false; } }
 function nqEl(node){
   if(!node || !nqActive()) return node;
+  if(node.classList) node.classList.add("nq");      /* גופן קל יותר וריווח — הנקודות לא נבלעות באות עבה */
   const tw=document.createTreeWalker(node,NodeFilter.SHOW_TEXT,{acceptNode:t=>t.parentElement&&t.parentElement.closest(".tag,.say-btn")?NodeFilter.FILTER_REJECT:NodeFilter.FILTER_ACCEPT});
   const list=[]; while(tw.nextNode()) list.push(tw.currentNode);
   /* כפתור 🔊 קורא את הטקסט המקורי (כתיב מלא), לא את המנוקד — "בַּבֹּקֶר" בלי ניקוד הוא "בבקר" */
@@ -545,7 +550,7 @@ function words(h,m){
 function say(text){
   const b=$("#bubble"); b.textContent=gx(text);
   try{ if(voiceMode()==="auto") speak(b.textContent); }catch(e){}
-  nqEl(b);                                   /* ניקוד לתצוגה בלבד — ההקראה כבר קיבלה את הטקסט הרגיל */
+  b.classList.remove("nq"); nqEl(b);                                   /* ניקוד לתצוגה בלבד — ההקראה כבר קיבלה את הטקסט הרגיל */
   b.classList.remove("pop"); void b.offsetWidth; b.classList.add("pop");
 }
 function toast(text, bad=false){
@@ -2832,7 +2837,10 @@ if(DEV && !DB.data.settings.onboarded) makeTestProfile();
 if(DB.data.settings.onboarded){
   renderMap(); go("map");
   if(DB.data.settings.consent===undefined) setTimeout(askConsent,1500); else cloudSync("open");
-  say(`שלום ${DB.data.child.name}! בחרי תחנה במפה.`);
+  /* v11: אם נפתח מסך "היום", הוא כבר אמר מה עושים — לא לדרוס אותו. בכיתות א׳–ב׳ אין "בחרי במפה" — יש כפתור אחד */
+  const young=(DB.data.child.grade||0)>0 && DB.data.child.grade<=2;
+  if(!$("#scr-today").classList.contains("on"))
+    say(young&&nextLevel() ? `שלום ${DB.data.child.name}! לוחצים על מתחילים יחד.` : `שלום ${DB.data.child.name}! בחרי תחנה במפה.`);
 }else{
   renderOb(); go("onboard");
 }
