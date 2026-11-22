@@ -132,7 +132,10 @@ h2{font-size:20px;font-weight:900;margin:0 0 6px}
 @keyframes shake{0%,100%{transform:none}20%{transform:rotate(-2deg) translateX(-5px)}50%{transform:rotate(2deg) translateX(5px)}80%{transform:rotate(-1deg)}}
 
 /* ---------- cycle (24h ring + sky) ---------- */
-.ring-panel{display:flex;justify-content:center}
+.ring-panel{display:flex;flex-direction:column;align-items:center}
+.daycircle{width:100%;max-width:340px;height:auto;overflow:visible}
+.ring-cap{text-align:center;font-size:13px;font-weight:800;color:var(--ink60);margin:2px 0 0}
+.seg.no{fill:var(--oops)}
 .ring-panel svg{width:100%;max-width:320px;height:auto}
 .seg{cursor:pointer;transition:.2s}
 .seg.hot{stroke:#fff;stroke-width:3;filter:drop-shadow(0 0 8px rgba(255,255,255,.9))}
@@ -250,6 +253,26 @@ body.young .opt{font-size:17.5px;padding:16px}
 .devtools .btn{padding:8px 11px;font-size:13px;box-shadow:none}
 .devtools select{font:inherit;font-weight:700;font-size:13.5px;border:2px solid #ffb48f;border-radius:10px;padding:6px 8px;background:#fff;color:var(--ink)}
 .node.open{border-color:#c9d4f3}
+/* v11 — numbered stations, "start here", separate bonus row, one big start button for grades 1–2 */
+.node .num{position:absolute;top:8px;right:10px;min-width:22px;height:22px;line-height:22px;border-radius:999px;background:#eef2ff;color:var(--ink60);font-weight:900;font-size:13px;text-align:center}
+.node.cur .num{background:var(--sun);color:#3a2a00}
+.node.cur .st{color:#9a5b00;font-weight:900}
+#mapStart .btn{font-size:20px;padding:16px 18px}
+#mapBonus{margin-top:16px}
+#mapBonus .bonus-t{font-weight:900;color:var(--ink60);font-size:14px;margin:0 2px 8px}
+.btn.start{font-size:21px;padding:18px}
+/* v11 חבילה 2 — מסך פתיחה לתחנה, הוראה בולטת למעלה, מעבר רך בין שאלות */
+.st-intro{animation:qin .35s ease}
+.st-intro .st-lead{font-size:20px;font-weight:800;line-height:1.6;color:var(--ink);margin:4px 0 14px}
+body.young .st-intro .st-lead{font-size:23px}
+.qtop{margin:2px 0 14px}
+#levelBody .q{border-inline-start:6px solid var(--sun);padding-inline-start:12px;animation:qin .35s ease}
+@keyframes qin{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){#levelBody .q,.st-intro{animation:none}}
+/* הערת Edge: מוצגת רק כשאין קול עברי. body.novoice נקבע אחרי שהקולות נטענים, ולכן ההחלטה ב־CSS */
+.voicenote{display:none;align-items:center;gap:10px;flex-wrap:wrap;background:#fff7e6;border:2px solid #ffd27a;border-radius:14px;padding:10px 14px;margin:0 0 12px;font-weight:700;font-size:14.5px}
+body.novoice .voicenote{display:flex}
+.voicenote .linkbtn{margin:0}
 .devbox{margin-top:22px;border-top:2px solid var(--line);padding-top:16px}
 .linkbtn{background:none;border:0;color:var(--minute);font:inherit;font-weight:700;text-decoration:underline;cursor:pointer;margin-top:12px;padding:0}
 .pin{letter-spacing:12px;text-align:center;font-size:26px!important;max-width:220px!important;display:block;margin:6px auto}
@@ -367,7 +390,9 @@ body.novoice .say-btn{display:none}
       <div id="devBanner"></div>
       <h2 id="mapTitle">המסע שלי</h2>
       <p class="lead" id="mapLead">כל תחנה היא שלב. מסיימים אחת — נפתחת הבאה.</p>
+      <div id="mapStart"></div>
       <div class="map" id="mapGrid"></div>
+      <div id="mapBonus"></div>
       <div class="ladder" id="mapLadder"></div>
     </div>
   </section>
@@ -421,7 +446,7 @@ body.novoice .say-btn{display:none}
   </section>
 </div>
 
-<div class="guide"><div class="owl">🦉</div><div class="bubble" id="bubble">שלום! אני טיק־טק.</div></div>
+<div class="guide"><div class="owl">🦉</div><div class="bubble" id="bubble">שלום!</div></div>
 <div class="modal" id="modal"><div class="box" id="modalBox"></div></div>
 <div class="print-only" id="printSheet"></div>
 
@@ -471,10 +496,30 @@ function gx(s){
   for(const [re,m] of GX_RE) s=s.replace(re,(all,pre)=>pre+m);
   return s;
 }
+/* v11 חבילה 3 — ניקוד (תנועות) לכיתות א׳–ב׳, בתחנה הראשונה בלבד (NQ_SCOPE).
+   שכבת תצוגה: מופעלת אחרי gx (שעובד על טקסט בלי ניקוד), לא נוגעת בהקראה (cleanSpeech מסיר ניקוד),
+   ומנקדת רק מילים שבמילון — כתיב חסר מנוקד, כמו בספרי ילדים. הרשימה לבדיקה: docs/niqqud-review-2026-11-22.md */
+const NQ_SCOPE=["line"];
+const NQ={"היממה":"הַיְמָמָה","ביממה":"בַּיְמָמָה","היא":"הִיא","קו":"קַו","הקו":"הַקַּו","של":"שֶׁל","שעות":"שָׁעוֹת","מתחילה":"מַתְחִילָה","מתחיל":"מַתְחִיל","ומתחיל":"וּמַתְחִיל","מתחילים":"מַתְחִילִים","חצות":"חֲצוֹת","בחצות":"בַּחֲצוֹת","ונגמרת":"וְנִגְמֶרֶת","נגמר":"נִגְמָר","ואז":"וְאָז","יום":"יוֹם","ויום":"וְיוֹם","היום":"הַיּוֹם","חדש":"חָדָשׁ","שוב":"שׁוּב","אחרי":"אַחֲרֵי","שאחרי":"שֶׁאַחֲרֵי","בא":"בָּא","למשל":"לְמָשָׁל","בבוקר":"בַּבֹּקֶר","בוקר":"בֹּקֶר","המשבצת":"הַמִּשְׁבֶּצֶת","המשבצות":"הַמִּשְׁבְּצוֹת","השביעית":"הַשְּׁבִיעִית","דוגמה":"דֻּגְמָה","לחצי":"לַחֲצִי","לחץ":"לְחַץ","על":"עַל","השעה":"הַשָּׁעָה","בשעה":"בְּשָׁעָה","שבה":"שֶׁבָּהּ","רמז":"רֶמֶז","הראשונה":"הָרִאשׁוֹנָה","בצד":"בַּצַּד","ימין":"יָמִין","עם":"עִם","הירח":"הַיָּרֵחַ","קמים":"קָמִים","סופרים":"סוֹפְרִים","אחת":"אַחַת","שתיים":"שְׁתַּיִם","שלוש":"שָׁלוֹשׁ","עד":"עַד","ועד":"וְעַד","שבע":"שֶׁבַע","מה":"מָה","עליו":"עָלָיו","שליד":"שֶׁלְּיַד","הבאה":"הַבָּאָה","בתור":"בַּתּוֹר","באמצע":"בְּאֶמְצַע","אמצע":"אֶמְצַע","בצהריים":"בַּצָּהֳרַיִם","צהריים":"צָהֳרַיִם","השמש":"הַשֶּׁמֶשׁ","כמה":"כַּמָּה","יש":"יֵשׁ","ספרי":"סִפְרִי","ספור":"סְפֹר","נכון":"נָכוֹן","מכאן":"מִכָּאן","טוב":"טוֹב","זה":"זֶה","כמו":"כְּמוֹ","ראשון":"רִאשׁוֹן","שני":"שֵׁנִי","הבנתי":"הֵבַנְתִּי","משימה":"מְשִׂימָה","מתוך":"מִתּוֹךְ","את":"אֶת"};
+const NQ_MARKS="\u05B0-\u05BD\u05BF\u05C1\u05C2\u05C4\u05C5\u05C7";
+const NQ_WORD=new RegExp("[\u05D0-\u05EA"+NQ_MARKS+"]+","g");
+function nqText(s){
+  return s.replace(/(^|[^\u05D0-\u05EA])ב־/g,"$1בְּ־").replace(/(^|[^\u05D0-\u05EA])מ־/g,"$1מֵ־").replace(NQ_WORD,w=>NQ[w]||w);
+}
+function nqActive(){ try{ const g=DB.data.child.grade||0; return g>0 && g<=2 && NQ_SCOPE.includes(LV.id) && $("#scr-level").classList.contains("on"); }catch(e){ return false; } }
+function nqEl(node){
+  if(!node || !nqActive()) return node;
+  const tw=document.createTreeWalker(node,NodeFilter.SHOW_TEXT,{acceptNode:t=>t.parentElement&&t.parentElement.closest(".tag,.say-btn")?NodeFilter.FILTER_REJECT:NodeFilter.FILTER_ACCEPT});
+  const list=[]; while(tw.nextNode()) list.push(tw.currentNode);
+  /* כפתור 🔊 קורא את הטקסט המקורי (כתיב מלא), לא את המנוקד — "בַּבֹּקֶר" בלי ניקוד הוא "בבקר" */
+  for(const qn of [node,...node.querySelectorAll(".q")]) if(qn.classList&&qn.classList.contains("q")&&!qn.dataset.say) qn.dataset.say=qn.textContent.replace("🔊","");
+  for(const t of list){ const v=nqText(t.nodeValue); if(v!==t.nodeValue) t.nodeValue=v; }
+  return node;
+}
 const el = (tag, cls, html)=>{ const n=document.createElement(tag); if(cls)n.className=cls; if(html!=null)n.innerHTML=gx(html);
   if(cls==="q" && "speechSynthesis" in window){ try{ if(voiceMode()!=="off"){
     const b=document.createElement("button"); b.className="say-btn"; b.type="button"; b.textContent="🔊"; b.title="הקראה";
-    b.onclick=e=>{ e.stopPropagation(); speak(n.textContent.replace("🔊",""),true); }; n.appendChild(b); } }catch(e){} }
+    b.onclick=e=>{ e.stopPropagation(); speak((n.dataset.say||n.textContent).replace("🔊",""),true); }; n.appendChild(b); } }catch(e){} }
   return n; };
 
 const HNAME = ["שתים־עשרה","אחת","שתיים","שלוש","ארבע","חמש","שש","שבע","שמונה","תשע","עשר","אחת־עשרה"];
@@ -500,6 +545,7 @@ function words(h,m){
 function say(text){
   const b=$("#bubble"); b.textContent=gx(text);
   try{ if(voiceMode()==="auto") speak(b.textContent); }catch(e){}
+  nqEl(b);                                   /* ניקוד לתצוגה בלבד — ההקראה כבר קיבלה את הטקסט הרגיל */
   b.classList.remove("pop"); void b.offsetWidth; b.classList.add("pop");
 }
 function toast(text, bad=false){
@@ -933,17 +979,29 @@ function renderMap(){
     db.appendChild(bar);
   }
   const grid=$("#mapGrid"); grid.innerHTML="";
+  const bon=$("#mapBonus"); bon.innerHTML="";
+  const young=(c.grade||0)>0 && c.grade<=2;
+  /* v11 חבילה 1: לכיתות א׳–ב׳ — כפתור אחד גדול שפותח את התחנה הבאה */
+  const start=$("#mapStart"); start.innerHTML=""; voiceNote(start);
+  if(young && nx){ const r=el("div","btn-row"); const b=el("button","btn sun wide start",`▶ מתחילים יחד — ${nx.ic} ${nx.nm}`);
+    b.onclick=()=>openLevel(nx.id); r.appendChild(b); start.appendChild(r); }
+  const bonusRow=el("div","map"); let num=0;
   LEVELS.forEach((l,i)=>{
     const st=levelState(i);
+    if(!l.bonus) num++;
     const n=el("div","node "+st);
     const p=prog(l.id);
-    n.innerHTML=`<div class="badge">${l.bonus?"🎁":st==="done"?"⭐":st==="lock"?"🔒":st==="skip"?"✓":st==="open"?"🛠️":"▶"}</div>
+    n.innerHTML=(l.bonus?"":`<div class="num">${num}</div>`)+`<div class="badge">${l.bonus?"🎁":st==="done"?"⭐":st==="lock"?"🔒":st==="skip"?"✓":st==="open"?"🛠️":"▶"}</div>
       <div class="ic">${l.ic}</div>${mbar(l.id)}<div class="nm">${l.nm}</div>
       <div class="st">${st==="open"?(l.bonus?l.sub:"פתוח לבדיקה"):st==="done"&&l.bonus?"שחקו שוב — שאלות חדשות":st==="done"?(p.score!=null?`${p.score}/${p.of} נכונות`:"הושלם")
-        :st==="skip"?"כבר ידוע לך":st==="lock"?"עדיין נעול":l.sub}</div>`;
+        :st==="skip"?"כבר ידוע לך":st==="lock"?"עדיין נעול":st==="cur"?"▶ מתחילים כאן":l.sub}</div>`;
     if(st!=="lock") n.onclick=()=>openLevel(l.id);
-    grid.appendChild(n);
+    (l.bonus?bonusRow:grid).appendChild(n);
   });
+  /* בונוס בשורה נפרדת. בכיתות א׳–ב׳ — רק אחרי 3 תחנות, כדי שלא יבלבל "איפה מתחילים" (נויה, 21/11) */
+  const stationsDone=LEVELS.filter(l=>!l.bonus && prog(l.id)?.done).length;
+  if(bonusRow.children.length && (DEV || !young || stationsDone>=3)){
+    bon.appendChild(el("div","bonus-t","🎁 בונוס — אפשר בכל זמן")); bon.appendChild(bonusRow); }
   const lad=$("#mapLadder");
   lad.innerHTML = `מסלול: ` + LEVELS.filter(l=>!l.bonus).map((l)=>{ const i=idx(l.id);
     const st=levelState(i);
@@ -965,6 +1023,38 @@ function openLevel(id){
     quarter:()=>lvClock("quarter"), five:()=>lvClock("five"),
     cycle:lvCycle, twelve:lvTwelve, day:lvDay, digital:lvDigital, quiz:lvQuiz,
     line:lvLine, pie:lvPie, week:lvWeek, plan:lvPlanLearn, trivia:lvTrivia})[id]();
+  stationIntro(id);
+}
+/* v11 חבילה 2: ההסבר האפור בראש התחנה הופך למסך פתיחה — הסבר, הקראה, דוגמה — ורק אז המשימות.
+   (נויה, 21/11: שאלה ראשונה לפני הסבר בולט "הקפיצה אותה למים") */
+function stationIntro(id){
+  const host=$("#levelBody");
+  const lead=host.querySelector(":scope > p.lead");
+  if(!lead) return;
+  const content=el("div","st-content");
+  while(host.firstChild) content.appendChild(host.firstChild);
+  lead.remove(); content.hidden=true;
+  const intro=el("div","st-intro");
+  intro.appendChild(el("p","st-lead",gx(lead.textContent)));
+  const exKey=EXAMPLES[id+"_intro"] ? id+"_intro" : SKILL_OF[id];
+  const ex=exKey ? exampleCard(exKey,"דוגמה:") : null;
+  if(ex) intro.appendChild(ex);
+  const r=el("div","btn-row"); const b=el("button","btn sun wide start","הבנתי — מתחילים ▸");
+  b.onclick=()=>{ intro.remove(); content.hidden=false;
+    const q=content.querySelector(".q"); if(q) say(q.textContent); };
+  r.appendChild(b); intro.appendChild(r);
+  nqEl(intro);
+  host.append(intro,content);
+  try{ if(window.speechSynthesis) window.speechSynthesis.cancel(); }catch(e){}
+  say(lead.textContent);
+}
+/* הערת Edge (מוטי, 22/11): לכיתות א׳–ב׳, כשאין קול עברי. מוצגת דרך CSS בלבד (body.novoice) */
+function voiceNote(host){
+  const c=DB.data.child;
+  if(!(c.grade>0 && c.grade<=2) || DB.data.settings.voiceNoteHidden) return;
+  const n=el("div","voicenote","🔇 אין כאן הקראה בעברית. בכיתות א׳–ב׳ ההקראה עוזרת מאוד — כדאי לפתוח את המשחק בדפדפן Microsoft Edge.");
+  const x=el("button","linkbtn","הבנתי"); x.onclick=()=>{ DB.data.settings.voiceNoteHidden=true; DB.save(); n.remove(); };
+  n.appendChild(x); host.appendChild(n);
 }
 function setBar(p){ $("#lvlBar").style.width=Math.round(p*100)+"%"; }
 function levelDone(msg){
@@ -978,7 +1068,7 @@ function levelDone(msg){
   const nx=nextLevel();
   if(nx){ const b=el("button","btn go",`לשלב הבא: ${nx.nm} ▸`); b.onclick=()=>openLevel(nx.id); r.appendChild(b); }
   const m=el("button","btn ghost","חזרה למפה"); m.onclick=()=>{ renderMap(); go("map"); }; r.appendChild(m);
-  host.appendChild(box);
+  host.appendChild(box); nqEl(box);
   if(fact) host.appendChild(el("div","hint","💡 הידעת? "+fact));
   const ms=((DB.data.skills||{})[SKILL_OF[LV.id]]||{}).score;
   const firstRate = (LV.n && LV.score!=null) ? LV.score/LV.n : null;
@@ -1118,86 +1208,88 @@ function hourColor(h){
   if(h>=7&&h<=16) return "#7cc8f7"; if(h===6) return "#ffc98a"; if(h===17) return "#ffb97a";
   if(h===18) return "#f0875a"; if(h===19) return "#b4669b"; if(h===20) return "#5b4590"; return "#22305f";
 }
-function buildRing(host,onPick){
-  const svg=svgEl("svg",{viewBox:"0 0 340 340"}); host.appendChild(svg);
-  const cx=170,cy=170,R=150,r=92, segs=[];
+/* v11 — עיגול היממה, לפי research/day-circle-decision-2026-11-21.md:
+   00 למעלה · 06 ימין · 12 למטה · 18 שמאל, בכיוון השעון (polar: 0° = למעלה).
+   רק ארבע נקודות עוגן מסומנות, והמספרים יוצאים החוצה — 06 ו־18 לא נחתכים. בלי שעון מחוגים במסך הזה. */
+function buildDayCircle(host,onPick){
+  const S=360, cx=180, cy=180, R=128, r=80;
+  const svg=svgEl("svg",{viewBox:`0 0 ${S} ${S}`,class:"daycircle"}); host.appendChild(svg);
+  const segs=[];
   for(let h=0;h<24;h++){
-    const a0=(h-12)*15-7.5, a1=a0+15;
+    const a0=h*15-7.5, a1=a0+15;
     const [x1,y1]=polar(cx,cy,R,a0),[x2,y2]=polar(cx,cy,R,a1),[x3,y3]=polar(cx,cy,r,a1),[x4,y4]=polar(cx,cy,r,a0);
     const p=svgEl("path",{d:`M${x1} ${y1} A${R} ${R} 0 0 1 ${x2} ${y2} L${x3} ${y3} A${r} ${r} 0 0 0 ${x4} ${y4} Z`,
-      class:"seg",fill:hourColor(h),stroke:"rgba(255,255,255,.55)","stroke-width":1.2});
+      class:"seg","data-h":h,fill:hourColor(h),stroke:"rgba(255,255,255,.7)","stroke-width":1.4});
     svg.appendChild(p); segs[h]=p;
-    if(onPick) p.addEventListener("click",()=>onPick(h));
-    if(h%3===0){ const [tx,ty]=polar(cx,cy,R+15,a0+7.5);
-      const t=svgEl("text",{x:tx,y:ty,"text-anchor":"middle","dominant-baseline":"central","font-size":14,"font-weight":800,fill:"#5b6189","font-family":"Rubik, sans-serif"});
-      t.textContent=pad(h); svg.appendChild(t); }
+    if(onPick) p.addEventListener("click",()=>onPick(h,p));
   }
-  svg.appendChild(svgEl("circle",{cx,cy,r:82,fill:"#fff"}));
-  const sun=svgEl("text",{x:cx,y:cy-116,"text-anchor":"middle","font-size":20}); sun.textContent="☀️";
-  const moon=svgEl("text",{x:cx,y:cy+124,"text-anchor":"middle","font-size":20}); moon.textContent="🌙";
-  const ic=svgEl("text",{x:cx,y:cy-16,"text-anchor":"middle","dominant-baseline":"central","font-size":32});
-  const tm=svgEl("text",{x:cx,y:cy+22,"text-anchor":"middle","dominant-baseline":"central","font-size":27,"font-weight":900,fill:"#1d2246","font-family":"Rubik, sans-serif"});
-  svg.append(sun,moon,ic,tm);
-  return function hl(h){
-    segs.forEach(s=>s.classList.remove("hot")); segs[h].classList.add("hot");
-    const night=(h>=20||h<6); ic.textContent=night?"🌙":"☀️"; tm.textContent=pad(h)+":00";
+  for(const h of [0,6,12,18]){                                   /* ארבע נקודות עוגן בלבד */
+    const [tx,ty]=polar(cx,cy,R+24,h*15);
+    const t=svgEl("text",{x:tx,y:ty,class:"anc","text-anchor":"middle","dominant-baseline":"central","font-size":18,"font-weight":900,fill:"#2b3366","font-family":"Rubik, sans-serif"});
+    t.textContent=pad(h); svg.appendChild(t);
+  }
+  const moon=svgEl("text",{x:polar(cx,cy,R+26,337)[0],y:polar(cx,cy,R+26,337)[1],"text-anchor":"middle","dominant-baseline":"central","font-size":18}); moon.textContent="🌙";
+  const sun =svgEl("text",{x:polar(cx,cy,R+26,157)[0],y:polar(cx,cy,R+26,157)[1],"text-anchor":"middle","dominant-baseline":"central","font-size":18}); sun.textContent="☀️";
+  svg.appendChild(svgEl("circle",{cx,cy,r:r-6,fill:"#fff"}));
+  const tm=svgEl("text",{x:cx,y:cy,"text-anchor":"middle","dominant-baseline":"central","font-size":30,"font-weight":900,fill:"#1d2246","font-family":"Rubik, sans-serif"});
+  svg.append(moon,sun,tm);
+  return {
+    hl(h){ segs.forEach(s=>s.classList.remove("hot")); if(h!=null){ segs[h].classList.add("hot"); tm.textContent=pad(h); } else tm.textContent=""; },
+    no(h){ segs[h].classList.add("no"); setTimeout(()=>segs[h].classList.remove("no"),650); }
   };
-}
-function skyFor(h){
-  if(h<5) return ["#0d1838","#22305f"]; if(h<7) return ["#2b2a60","#f2a86d"]; if(h<10) return ["#6fc0f3","#d6efff"];
-  if(h<16) return ["#3fa9f5","#bfe8ff"]; if(h<18) return ["#71b9e6","#ffd9a0"]; if(h<20) return ["#ef8358","#6a4b9c"];
-  if(h<22) return ["#3b2f6e","#182045"]; return ["#0d1838","#22305f"];
 }
 function lvCycle(){
   const host=$("#levelBody"); host.innerHTML="";
-  host.appendChild(el("p","lead","זוכרת את הקו של היממה? מקפלים אותו לעיגול — ומקבלים את עיגול היממה: למעלה יום, למטה לילה, ובתחתית — חצות."));
-  const sky=el("div","sky",'<span class="orb">🌙</span><span class="sky-label"></span>');
-  for(let i=0;i<12;i++){ const t=el("span","twinkle"); t.style.right=(4+Math.random()*92)+"%"; t.style.top=(8+Math.random()*60)+"%"; sky.appendChild(t); }
-  host.appendChild(sky);
-  const paintSky=(h,m)=>{
-    const [a,b]=skyFor(h); sky.style.background=`linear-gradient(170deg,${a},${b})`;
-    const night=(h>=20||h<6); sky.classList.toggle("is-night",night);
-    const orb=sky.querySelector(".orb"); orb.textContent=night?"🌙":"☀️";
-    orb.style.right=(((h*60+m)/1440)*100)+"%";
-    sky.querySelector(".sky-label").textContent=words(h,m);
-  };
-  const grid=el("div","task-grid"), left=el("div"), right=el("div");
-  grid.append(left,right); host.appendChild(grid);
-  const STEPS=[{k:"dn",h:22,a:"night"},{k:"dn",h:13,a:"day"},
-    {k:"tap",h:0,q:"לחצי בעיגול על השעה שבה מתחיל היום — 00:00.",hint:"רמז: למטה, באמצע העיגול — איפה שהירח."},
-    {k:"tap",h:7,q:"לחצי בעיגול על השעה שבה קמים — 07:00.",hint:"רמז: בצד שמאל של העיגול, קצת מעל האמצע — שם השמש זורחת."},
-    {k:"quiz"}];
+  host.appendChild(el("p","lead","זוכרת את הקו של היממה? אותן 24 שעות אפשר לסדר גם בעיגול. למעלה 00 — חצות. למטה 12 — צהריים. לחיצה על שעה מדליקה אותה גם בקו וגם בעיגול: אותה שעה, רק מסודרת אחרת."));
+  const box=el("div","qtop"); host.appendChild(box);                    /* ההוראה למעלה */
+  const lineHost=el("div",null,dayLineHTML()); host.appendChild(lineHost);  /* הקו המקורי נשאר */
+  const rp=el("div","ring-panel"); host.appendChild(rp);
+  const hourOf=(t,d)=>{ const n=parseInt(String(t||"").split(":")[0],10); return Number.isFinite(n)&&n>=0&&n<24?n:d; };
+  const wake=hourOf(DB.data.settings.wake,7), sleepH=hourOf(DB.data.settings.sleep,20);
+  const where=h=>h===0?"למעלה, ליד הירח":h<6?"בין 00 ל־06 — למעלה מימין":h===6?"בצד ימין":h<12?"בין 06 ל־12 — למטה מימין":
+                 h===12?"למטה, ליד השמש":h<18?"בין 12 ל־18 — למטה משמאל":h===18?"בצד שמאל":"בין 18 ל־00 — למעלה משמאל";
+  const STEPS=[
+    {k:"ring",h:0,  q:"איפה 00 — חצות? לחצי עליה בעיגול.", ok:"נכון! 00 — חצות, למעלה. רואה? היא נדלקה גם בקו."},
+    {k:"ring",h:6,  q:"ואיפה 06 — בוקר? לחצי עליה בעיגול.", ok:"נכון! 06 — בצד ימין."},
+    {k:"ring",h:12, q:"ואיפה 12 — צהריים? לחצי עליה בעיגול.", ok:"נכון! 12 — צהריים, למטה."},
+    {k:"ring",h:18, q:"ואיפה 18 — ערב? לחצי עליה בעיגול.", ok:"נכון! 18 — בצד שמאל."},
+    {k:"name",h:19, q:"איזו שעה נדלקה בעיגול?"},
+    {k:"line",h:19, q:"עכשיו לחצי על 19 בקו.", ok:"נכון! 19 — שבע בערב. אותה שעה, בקו ובעיגול."},
+    {k:"ring",h:wake,   q:`את קמה בשעה ${pad(wake)}. לחצי על ${pad(wake)} בעיגול.`, ok:`נכון! ${pad(wake)} — כאן מתחיל היום שלך.`}
+  ];
+  if(sleepH!==wake) STEPS.push({k:"ring",h:sleepH,q:`ובשעה ${pad(sleepH)} הולכים לישון. לחצי על ${pad(sleepH)} בעיגול.`,ok:`נכון! ${pad(sleepH)} — לילה טוב.`});
   LV.n=STEPS.length;
-  let mistakes=0, cur=null;
-  const rp=el("div","ring-panel"); right.appendChild(rp);
-  const hl=buildRing(rp,h=>{
-    paintSky(h,0); hl(h);
-    if(!cur||cur.k!=="tap") return;
-    if(h===cur.h){ SFX.ok(); track("day_night",!mistakes,false,mistakes,0); if(!mistakes) LV.score++; const k=cur.h; cur=null;
-      say(k===0?"נכון! 00:00 — חצות. כאן מתחיל היום וכאן הוא גם נגמר.":"נכון! 07:00 — השמש עולה ומתעוררים."); LV.i++; setTimeout(draw,900); }
-    else { SFX.oops(); mistakes++; say(cur.hint); }
+  let cur=null, miss=0;
+  const lightLine=h=>{ $$(".lc.on",lineHost).forEach(x=>x.classList.remove("on")); if(h!=null) lineHost.querySelector(`.lc[data-h="${h}"]`).classList.add("on"); };
+  const both=h=>{ C.hl(h); lightLine(h); };
+  const good=()=>{ SFX.ok(); track("day_night",miss===0,false,miss,0); if(miss===0) LV.score++; const t=cur; cur=null; say(t.ok); LV.i++; setTimeout(draw,1100); };
+  const C=buildDayCircle(rp,(h)=>{
+    both(h);                                                     /* כל לחיצה — בשני המקומות */
+    if(!cur || cur.k!=="ring") return;
+    if(h===cur.h) good();
+    else { SFX.oops(); miss++; C.no(h); say(`רמז: ${pad(cur.h)} נמצאת ${where(cur.h)}.`); }
+  });
+  rp.appendChild(el("p","ring-cap","זה מסלול היום, לא שמיים"));
+  lineHost.addEventListener("click",e=>{
+    const b=e.target.closest(".lc"); if(!b) return; const h=+b.dataset.h;
+    both(h);
+    if(!cur || cur.k!=="line") return;
+    if(h===cur.h) good();
+    else { b.classList.add("no"); SFX.oops(); miss++; say(`רמז: 19 בא מיד אחרי 18.`); setTimeout(()=>b.classList.remove("no"),600); }
   });
   function draw(){
-    if(LV.i>=STEPS.length){ grid.remove();
-      return levelDone("גילית שהקו של היממה הוא גם עיגול: 24 שעות, למעלה יום, למטה לילה, ובחצות מתחיל יום חדש."); }
-    setBar(LV.i/STEPS.length); left.innerHTML=""; mistakes=0; cur=STEPS[LV.i];
-    left.appendChild(el("p","qmeta",`משימה ${LV.i+1} מתוך ${STEPS.length}`));
-    const next=first=>{ if(first) LV.score++; LV.i++; setTimeout(draw,750); };
-    if(cur.k==="dn"){
-      hl(cur.h); paintSky(cur.h,0);
-      left.appendChild(el("p","q",`השעה ${pad(cur.h)}:00 — יום או לילה?`));
-      mcq(left,[["☀️ יום",cur.a==="day"],["🌙 לילה",cur.a==="night"]],
-          `רמז: ${pad(cur.h)}:00 נמצא ב${cur.a==="day"?"חצי העליון — שם השמש":"חצי התחתון — שם הירח"}.`,next);
-      say("למעלה יום, למטה לילה. מה התשובה?");
-    }else if(cur.k==="tap"){
-      left.appendChild(el("p","q",cur.q)); say(cur.q);
-    }else{
-      left.appendChild(el("p","q","איזו שעה מתחיל יום חדש?"));
-      mcq(left,[["12:00 בצהריים",false],["00:00 בלילה — חצות",true],["06:00 בבוקר",false]],
-          "רמז: היום החדש מתחיל כשחשוך וכולם ישנים.",next);
-    }
+    if(LV.i>=STEPS.length){ box.remove();
+      return levelDone("גילית שהקו של היממה הוא גם עיגול: אותן 24 שעות — 00 למעלה, 06 מימין, 12 למטה, 18 משמאל."); }
+    setBar(LV.i/STEPS.length); box.innerHTML=""; miss=0; cur=STEPS[LV.i];
+    box.appendChild(el("p","qmeta",`משימה ${LV.i+1} מתוך ${STEPS.length}`));
+    box.appendChild(el("p","q",cur.q));
+    if(cur.k==="name"){
+      C.hl(19); lightLine(null);
+      mcq(box,shuffle([["19",true],["17",false],["21",false]]),"רמז: השעה שמיד אחרי 18.",first=>{ track("day_night",first,false,first?0:1,0); if(first) LV.score++; LV.i++; setTimeout(draw,800); });
+    } else if(cur.k==="ring"){ both(null); }
+    say(cur.q);
   }
-  draw(); paintSky(22,0);
+  draw();
 }
 
 /* =====================================================================
@@ -1431,7 +1523,7 @@ function renderParent(){
     if(!VOICE.he) return;
     let started=false;
     vt.textContent="⏳ מנסה להקריא…";
-    speak("שלום! אני טיק־טק. השעה שבע וחצי בבוקר.",true,{
+    speak("שלום! השעה שבע וחצי בבוקר.",true,{
       start:()=>{ started=true; vt.textContent=`✅ הקול עובד (${VOICE.he.name}).`; },
       error:er=>{ vt.textContent=`❌ ההקראה נכשלה: ${er}. נסו Microsoft Edge.`; } });
     setTimeout(()=>{ if(!started && !VOICE.lastErr) vt.textContent="⚠️ הדפדפן קיבל את הבקשה אבל לא התחיל להקריא. בדקו שהרמקול לא מושתק, או נסו Microsoft Edge."; },3000);
@@ -1649,7 +1741,8 @@ function twelveLine(H,tap=false){
 }
 function lvTwelve(){
   const host=$("#levelBody"); host.innerHTML="";
-  host.appendChild(el("p","lead","ביממה יש 24 שעות = 12 + 12. אחרי 12 בצהריים ממשיכים לספור: 13, 14, 15… ו־13 זה בעצם 1 — אחת אחר הצהריים."));
+  host.appendChild(el("p","lead","ביממה יש 24 שעות = 12 + 12. אחרי 12 בצהריים ממשיכים לספור: 13, 14, 15… ו־13 זה בעצם 1 — אחת אחר הצהריים. ככה גם 19: 19 פחות 12 = 7. 19 = שבע בערב."));
+  const top=el("div","qtop"); host.appendChild(top);           /* v11: ההוראה מעל השורות */
   const lineHost=el("div"); host.appendChild(lineHost);
   const grid=el("div","task-grid"), left=el("div"), right=el("div","clock-wrap");
   grid.append(left,right); host.appendChild(grid);
@@ -1666,42 +1759,42 @@ function lvTwelve(){
   });
   const hero=e=>`<div class="hero"><div class="big">${e}</div></div>`;
   function draw(){
-    if(LV.i>=KINDS.length){ grid.remove(); lineHost.remove();
+    if(LV.i>=KINDS.length){ grid.remove(); lineHost.remove(); top.remove();
       return levelDone("עכשיו את יודעת: 13 זה 1, 14 זה 2… ואחרי 23:59 מגיע 00:00 — יום חדש."); }
-    setBar(LV.i/KINDS.length); left.innerHTML=""; right.innerHTML="";
+    setBar(LV.i/KINDS.length); top.innerHTML=""; left.innerHTML=""; right.innerHTML="";
     const kind=KINDS[LV.i];
-    left.appendChild(el("p","qmeta",`משימה ${LV.i+1} מתוך ${KINDS.length}`));
+    top.appendChild(el("p","qmeta",`משימה ${LV.i+1} מתוך ${KINDS.length}`));
     let H;
     if(kind==="toTwelve"){
       H=rH(); lineHost.innerHTML=twelveLine(H); right.innerHTML=digiBox(H,0);
-      left.appendChild(el("p","q",`השעה ${H}:00. איזו שעה זו אם סופרים רק עד 12?`));
+      top.appendChild(el("p","q",`השעה ${H}:00. איזו שעה זו אם סופרים רק עד 12?`));
       mcq(left,shuffle([[String(H-12),true],[String(H-10),false],[String(H),false]]),
           `רמז: תסתכלי בשורה — מה עומד מעל ${H}? או: ${H} פחות 12.`,next);
       say("תסתכלי בשורה: מה עומד מעל המספר הצהוב?");
     }
     else if(kind==="toDigital"){
       H=rH(); lineHost.innerHTML=twelveLine(H); right.innerHTML=hero("🔢");
-      left.appendChild(el("p","q",`${words(H,0)} — איך כותבים את זה בשעון דיגיטלי?`));
+      top.appendChild(el("p","q",`${words(H,0)} — איך כותבים את זה בשעון דיגיטלי?`));
       mcq(left,shuffle([[`${pad(H)}:00`,true],[`${pad(H-12)}:00`,false],[`${pad(H-1)}:00`,false]]),
           `רמז: אחרי הצהריים מוסיפים 12. ${H-12} ועוד 12 = ?`,next);
       say("אחרי 12 בצהריים — מוסיפים 12.");
     }
     else if(kind==="say"){
       H=14+Math.floor(Math.random()*8); lineHost.innerHTML=twelveLine(H); right.innerHTML=digiBox(H,0);
-      left.appendChild(el("p","q",`${pad(H)}:00 — איך אומרים את השעה הזאת?`));
+      top.appendChild(el("p","q",`${pad(H)}:00 — איך אומרים את השעה הזאת?`));
       const alt=H+1<=23?H+1:H-2;
       mcq(left,shuffle([[words(H,0),true],[words(H-12,0),false],[words(alt,0),false]]),
           "רמז: מחסירים 12 כדי לדעת איזו שעה — ואחרי 12 זה אחר הצהריים, ערב או לילה.",next);
     }
     else if(kind==="tapName"){
       H=rH(); tapH=H; tapMiss=0; lineHost.innerHTML=twelveLine(null,true); right.innerHTML=hero("👆");
-      left.appendChild(el("p","q",`לחצי בשורות על השעה: "${words(H,0)}".`));
+      top.appendChild(el("p","q",`לחצי בשורות על השעה: "${words(H,0)}".`));
       say(`איפה ${words(H,0)}? לחצי על המספר.`);
     }
     else{
       const [a,b] = kind==="roll12" ? [[12,59],[13,0]] : [[23,59],[0,0]];
       lineHost.innerHTML=twelveLine(b[0]); right.innerHTML=digiBox(a[0],a[1]);
-      left.appendChild(el("p","q",`השעה ${pad(a[0])}:${pad(a[1])}. מה השעה דקה אחרי?`));
+      top.appendChild(el("p","q",`השעה ${pad(a[0])}:${pad(a[1])}. מה השעה דקה אחרי?`));
       const opts = kind==="roll12" ? [["12:60",false],["13:00",true],["00:00",false]]
                                    : [["23:60",false],["00:00",true],["12:00",false]];
       mcq(left,shuffle(opts), kind==="roll12"
@@ -1802,15 +1895,15 @@ function dayLineHTML(){
 function lvLine(){
   const host=$("#levelBody"); host.innerHTML="";
   host.appendChild(el("p","lead","היממה היא קו של 24 שעות. היא מתחילה ב־00:00 — חצות — ונגמרת ב־23:59. ואז מתחיל יום חדש, שוב מ־00."));
+  const box=el("div","qtop"); host.appendChild(box);          /* v11: ההוראה מעל הקו */
   const lineHost=el("div",null,dayLineHTML()); host.appendChild(lineHost);
-  const box=el("div"); host.appendChild(box);
   const T=[
     {k:"tap",h:0, q:"היום מתחיל בחצות — 00:00. לחצי על השעה שבה מתחיל היום.", hint:"רמז: המשבצת הראשונה — בצד ימין, עם הירח."},
     {k:"tap",h:7, q:"בבוקר קמים בשעה 7. לחצי על 07.", hint:"רמז: סופרים מ־00: אחת, שתיים, שלוש… עד שבע."},
     {k:"tap",h:8, q:"מה בא אחרי 7? לחצי עליו.", hint:"רמז: המשבצת שליד 07 — הבאה בתור."},
     {k:"mc",  q:"מה בא אחרי 23?", o:[["24",false],["00 — יום חדש",true],["22",false]],
      hint:"רמז: אחרי 23 היום נגמר, ומתחיל יום חדש — שוב מ־00."},
-    {k:"tap",h:19,q:"ארוחת ערב בשעה 19. לחצי על 19.", hint:"רמז: 19 בא אחרי 18 — בצד שמאל, כשכבר מחשיך."},
+    {k:"tap",h:12,q:"באמצע היום, בצהריים, השעה 12. לחצי על 12.", hint:"רמז: המשבצת עם השמש ☀️ — באמצע הקו."},
     {k:"mc",  q:"כמה שעות יש ביממה?", o:[["12",false],["24",true],["60",false]],
      hint:"רמז: ספרי את המשבצות — מ־00 ועד 23."}
   ];
@@ -1821,7 +1914,7 @@ function lvLine(){
     const b=e.target.closest(".lc"); if(!b||!cur||cur.k!=="tap") return;
     const h=+b.dataset.h;
     if(h===cur.h){ b.classList.add("on"); SFX.ok(); track("day_line",miss===0,false,miss,0); const t=cur; cur=null;
-      say(t.h===0?"נכון! 00:00 — חצות. מכאן היום מתחיל.":t.h===7?"נכון! 07:00 — בוקר טוב.":`נכון! ${pad(t.h)}.`); next(miss===0); }
+      say(t.h===0?"נכון! 00:00 — חצות. מכאן היום מתחיל.":t.h===7?"נכון! 07:00 — בוקר טוב.":t.h===12?"נכון! 12:00 — צהריים, אמצע היום.":`נכון! ${pad(t.h)}.`); next(miss===0); }
     else{ b.classList.add("no"); SFX.oops(); miss++; say(cur.hint); setTimeout(()=>b.classList.remove("no"),600); }
   });
   function draw(){
@@ -1832,6 +1925,7 @@ function lvLine(){
     box.appendChild(el("p","qmeta",`משימה ${LV.i+1} מתוך ${T.length}`));
     box.appendChild(el("p","q",cur.q));
     if(cur.k==="mc") mcq(box,shuffle(cur.o),cur.hint,next);
+    nqEl(box);
     say(cur.q);
   }
   draw();
@@ -2328,8 +2422,9 @@ function mbar(levelId){
 const EXAMPLES={
   day_line:    {t:"היממה מתחילה ב־00 — חצות — ונגמרת ב־23. אחרי 23 בא שוב 00, ויום חדש מתחיל. למשל: 7 בבוקר היא המשבצת השביעית אחרי 00.",e:"📏"},
   digital:     {t:"ב־07:59 — 07 הן השעות ו־59 הדקות. עוד דקה? אין 60 דקות, אז השעה עולה והדקות חוזרות ל־00: ‏08:00.",d:[7,59]},
-  twelve:      {t:"13:00 — מחסירים 12: ‏13 פחות 12 = 1. אז 13:00 זו אחת אחר הצהריים, והמחוג הקצר על ה־1.",d:[13,0]},
+  twelve:      {t:"13:00 — מחסירים 12: ‏13 פחות 12 = 1. אז 13:00 זו אחת אחר הצהריים. ו־19:00? ‏19 פחות 12 = 7 — שבע בערב.",d:[13,0]},
   day_night:   {t:"לילה — מ־20:00 עד 06:00, עם הירח. יום — מ־06:00 עד 20:00, עם השמש. למשל 22:00 — לילה.",e:"🌗"},
+  cycle_intro: {t:"12 נמצאת באמצע הקו — ובעיגול היא למטה. 00 בתחילת הקו — ובעיגול היא למעלה. אותה שעה, רק מסודרת אחרת.",e:"⭕"},
   fractions:   {t:"שעה = עוגה שלמה = 60 דקות. חצי עוגה = 30. רבע = 15. שלושה רבעים = 15 + 15 + 15 = 45.",p:.75},
   hands:       {t:"המחוג הקצר והאדום — שעות. הארוך והכחול — דקות. ב־3:00 הקצר על ה־3 והארוך על ה־12.",c:[3,0]},
   read_round:  {t:"כשהמחוג הארוך על ה־12 — השעה עגולה. הקצר על ה־8? אז השעה 8:00.",c:[8,0]},
@@ -2503,6 +2598,7 @@ function runQs(body,qs,onEnd){
 function renderToday(){
   const h=$("#todayBody"); h.innerHTML="";
   const c=DB.data.child, now=new Date(), hr=now.getHours(), td=todayD();
+  voiceNote(h);
   const greet=hr<5?"לילה טוב":hr<12?"בוקר טוב":hr<17?"צהריים טובים":hr<21?"ערב טוב":"לילה טוב";
   h.appendChild(el("h2",null,`☀️ היום של ${c.name||""}`));
   h.appendChild(el("p","lead",`${greet}! יום ${DAYN[td.getDay()]} · ${td.getDate()}/${td.getMonth()+1} · השעה ${pad(hr)}:${pad(now.getMinutes())}`));
@@ -2516,6 +2612,10 @@ function renderToday(){
     const r=el("div","btn-row"); const b=el("button","btn go","קדימה למפה ▸"); b.onclick=()=>{ renderMap(); go("map"); };
     r.appendChild(b); h.appendChild(r); say(msg);
   };
+  const young=(c.grade||0)>0 && c.grade<=2;
+  /* v11 חבילה 1: לכיתות א׳–ב׳ — כפתור אחד "מתחילים יחד". שום שאלה לא מופיעה לפני שהילדה לחצה */
+  const startBtn=(go)=>{ const r=el("div","btn-row"); const b=el("button","btn sun wide start","▶ מתחילים יחד");
+    b.onclick=()=>{ r.remove(); go(); }; r.appendChild(b); body.appendChild(r); return b; };
   if(m.type==="step"){
     const t=m.task;
     body.appendChild(el("div","mission",`⏳ יש לך 3 דקות: בדיקת מטלה שמתקרבת.`));
@@ -2531,11 +2631,11 @@ function renderToday(){
     say(`עשית את השלב "${m.step.title}"?`);
   }
   else if(m.type==="station"){
-    body.appendChild(el("div","mission","🧭 המשימה של היום: התחנה הבאה במסע."));
-    const b=el("button","btn sun wide",`${m.lvl.ic} ${m.lvl.nm} — יוצאים לדרך ▸`);
+    body.appendChild(el("div","mission",young?`🧭 היום: ${m.lvl.ic} ${m.lvl.nm}.`:"🧭 המשימה של היום: התחנה הבאה במסע."));
+    const b=el("button","btn sun wide"+(young?" start":""),young?"▶ מתחילים יחד":`${m.lvl.ic} ${m.lvl.nm} — יוצאים לדרך ▸`);
     b.onclick=()=>{ completeDaily("station"); TODAY_M=null; openLevel(m.lvl.id); };
     const r=el("div","btn-row"); r.appendChild(b); body.appendChild(r);
-    say(`המשימה של היום: ${m.lvl.nm}.`);
+    say(young?`היום: ${m.lvl.nm}. לוחצים על מתחילים יחד.`:`המשימה של היום: ${m.lvl.nm}.`);
   }
   else{
     const intro={review:"🔁 יש לך 3 דקות: בואו נבדוק שזה עדיין זכור.",transfer:"🧭 יש לך 3 דקות: זמן בחיים האמיתיים.",
@@ -2545,10 +2645,12 @@ function renderToday(){
     if(m.type==="review") qs=m.skills.map(genFor);
     else if(m.type==="challenge") qs=[genChallenge()];
     else { const a=genTransfer(); let b=genTransfer(), k=0; while(b.q===a.q&&k++<10) b=genTransfer(); qs=[a,b]; }
-    runQs(body,qs,(ok,n)=>finish(m.type, ok===n?`🌟 ${ok} מתוך ${n} בניסיון ראשון — מצוין!`:`👍 ${ok} מתוך ${n} בניסיון ראשון. מה שהיה קשה — נחזור עליו בקרוב.`));
+    const run=()=>runQs(body,qs,(ok,n)=>finish(m.type, ok===n?`🌟 ${ok} מתוך ${n} בניסיון ראשון — מצוין!`:`👍 ${ok} מתוך ${n} בניסיון ראשון. מה שהיה קשה — נחזור עליו בקרוב.`));
+    if(young){ startBtn(run); say(intro.replace(/^\S+\s/,"")+" לוחצים על מתחילים יחד."); }
+    else run();
   }
   footer.appendChild(weekStory());
-  const skip=el("button","linkbtn","אחר כך"); skip.onclick=()=>{ SKIP_TODAY=ymd(todayD()); renderMap(); go("map"); };
+  const skip=el("button","linkbtn",young?"🗺️ למפת המסע":"אחר כך"); skip.onclick=()=>{ SKIP_TODAY=ymd(todayD()); renderMap(); go("map"); };
   footer.appendChild(skip);
 }
 
@@ -2568,7 +2670,7 @@ if("speechSynthesis" in window){
 }else{ try{ document.body.classList.add("novoice"); }catch(e){} }
 function voiceMode(){ try{ return DB.data.settings.voice || ((DB.data.child.grade||0)<=2?"auto":"button"); }catch(e){ return "button"; } }
 function cleanSpeech(text){
-  return String(text).replace(/[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{2B00}-\u{2BFF}\uFE0F\u200D]/gu,"").replace(/[▸◂▲▼✓×⣿]/g,"").replace(/\s+/g," ").trim();
+  return String(text).replace(new RegExp("["+NQ_MARKS+"]","g"),"").replace(/[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{2B00}-\u{2BFF}\uFE0F\u200D]/gu,"").replace(/[▸◂▲▼✓×⣿]/g,"").replace(/\s+/g," ").trim();
 }
 let UTT=null;                                   /* keep a reference: Chromium may drop un-referenced utterances */
 function speak(text,force,hooks){
